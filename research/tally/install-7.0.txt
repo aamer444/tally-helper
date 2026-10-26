@@ -1,0 +1,187 @@
+# TallyPrime 7.0  (C:\Program Files\TallyPrime)
+
+## Executables
+
+Name                     Length Version
+----                     ------ -------
+Setup.exe               3360520 1.1.7.0
+tally.exe              17961152 1.1.7.0
+tallygatewayserver.exe  4261568 1.1.7.0
+tallymigrationtool.exe 21274304 1.1.7.0
+tallyscheduler.exe      5502144 1.1.7.0
+
+
+
+## Folder tree (depth 2, company data excluded)
+
+Path                                                                                  Length   Modified  
+----                                                                                  ------   --------  
+\appdata                                                                                       2026-02-05
+\appresources                                                                                  2026-02-06
+\capsules                                                                                      2026-09-08
+\config                                                                                        2026-02-05
+\lang                                                                                          2026-02-05
+\logs                                                                                          2026-02-05
+\15g.GrpIntr.xlsx                                                                     11298    2026-04-23
+\AKOLAWLA.GrpIntr.pdf                                                                 1565     2026-03-26
+\BALIRAJA.23-24.Tally.pdf                                                             3061     2026-05-23
+\BALIRAJA24-25.Tally.pdf                                                              3652     2026-05-23
+\BSheet.pdf                                                                           3133     2026-06-30
+\clientlicinfo.tsf                                                                    568      2026-10-17
+\FAISAL.25-26.PandL.pdf                                                               4002     2026-06-30
+\HUMA {COMPANY}.xlsx                                                                      11424    2026-05-22
+\METRO 25-26.PandL.pdf                                                                4839     2026-04-24
+\METRO STATMENT..pdf                                                                  4940     2026-04-14
+\METRO.PandL.pdf                                                                      4784     2026-04-24
+\PAMPATWAR..pdf                                                                       9462     2026-04-14
+\PandL.pdf                                                                            4367     2026-03-26
+\returns_03042026_R2A_27AAOPV3431G1ZF_R2A_others_0.zip                                21633    2026-04-03
+\returns_03042026_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                13881    2026-04-03
+\returns_03062026_R2A_27AADFB5366P1ZY_R2A_others_0.zip                                2424     2026-06-03
+\returns_03062026_R2A_27AAOPV3427C1ZJ_R2A_others_0.zip                                2535     2026-06-04
+\returns_03062026_R2A_27AAOPV3431G1ZF_R2A_others_0.zip                                25428    2026-06-03
+\returns_03062026_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                12308    2026-06-03
+\returns_03072026_R2A_27AAOPV3431G1ZF_R2A_others_0.zip                                20712    2026-07-04
+\returns_03072026_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                15632    2026-07-04
+\returns_04022026_R2A_27AAOPV3431G1ZF_R2A_others_0.zip                                21820    2026-02-05
+\returns_04032026_R2A_27AAOPV3427C1ZJ_R2A_others_0.zip                                3314     2026-03-04
+\returns_04032026_R2A_27AAOPV3431G1ZF_R2A_others_0.zip                                17707    2026-03-04
+\returns_04032026_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                8905     2026-03-04
+\returns_04052026_R2A_27AAOPV3427C1ZJ_R2A_others_0.zip                                2948     2026-05-04
+\returns_04052026_R2A_27AAOPV3431G1ZF_R2A_others_0.zip                                26196    2026-05-04
+\returns_04052026_R2A_27AIXPV6671R1ZM_R2A_others_0 (1).zip                            9983     2026-05-04
+\returns_04052026_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                9983     2026-05-04
+\returns_04092026_R2A_27AAOPV3427C1ZJ_R2A_others_0.zip                                8373     2026-09-05
+\returns_05022026_R2A_27AAOPV3427C1ZJ_R2A_others_0.zip                                3165     2026-02-05
+\returns_06022026_R2A_27ARJPJ5325M1ZF_R2A_others_0.zip                                7238     2026-02-06
+\returns_06062026_R2A_27ARJPJ5325M1ZF_R2A_others_0 (2).zip                            10799    2026-06-06
+\returns_06062026_R2A_27ARJPJ5325M1ZF_R2A_others_0.zip                                7195     2026-06-06
+\returns_06072026_R2A_27AAOPV3427C1ZJ_R2A_others_0 (1).zip                            4538     2026-07-07
+\returns_06102026_R2A_27ARJPJ5325M1ZF_R2A_others_0.zip                                9193     2026-10-06
+\returns_08042026_R2A_27ARJPJ5325M1ZF_R2A_others_0 (1).zip                            6885     2026-04-11
+\returns_R2B_27AADFB5366P1ZY_062026.json                                              14971    2026-07-14
+\returns_R2B_27AAOPV3427C1ZJ_062026.json                                              32801    2026-07-14
+\returns_R2B_27AAOPV3431G1ZF_012026 (1).json                                          176242   2026-04-23
+\returns_R2B_27AAOPV3431G1ZF_012026.json                                              176242   2026-04-03
+\returns_R2B_27AAOPV3431G1ZF_022026 (1).json                                          149139   2026-04-23
+\returns_R2B_27AAOPV3431G1ZF_022026.json                                              149139   2026-04-03
+\returns_R2B_27AAOPV3431G1ZF_032026 (1).json                                          189326   2026-04-23
+\returns_R2B_27AAOPV3431G1ZF_032026.json                                              189326   2026-04-14
+\returns_R2B_27AAOPV3431G1ZF_042025.json                                              166070   2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_052025.json                                              126117   2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_062025.json                                              128168   2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_062026.json                                              146375   2026-07-14
+\returns_R2B_27AAOPV3431G1ZF_072025.json                                              119346   2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_082025.json                                              126587   2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_092025.json                                              96682    2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_102025.json                                              115855   2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_112025 (1).json                                          117460   2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_112025.json                                              117460   2026-02-04
+\returns_R2B_27AAOPV3431G1ZF_122025.json                                              124422   2026-02-04
+\returns_R2B_27AIXPV6671R1ZM_062026.json                                              106246   2026-07-14
+\returns_R2B_27AKQPB3911K1Z2_062026.json                                              236174   2026-07-14
+\returns_R2B_27ARJPJ5325M1ZF_012026.json                                              80646    2026-02-19
+\returns_R2B_27ARJPJ5325M1ZF_042026.json                                              112854   2026-05-21
+\returns_R2B_27ARJPJ5325M1ZF_052026.json                                              91770    2026-06-25
+\returns_R2B_27ARJPJ5325M1ZF_062026.json                                              113690   2026-07-18
+\RUDRAKSH.Tally.pdf                                                                   1849     2026-05-14
+\SAAD {COMPANY} 25-26.xlsx                                                                12661    2026-05-25
+\SAAD.StkGrpSum.xlsx                                                                  11792    2026-05-25
+\Sales_1417.pdf                                                                       70846    2026-04-14
+\Sales_1606.pdf                                                                       71272    2026-04-14
+\Sales_1697.pdf                                                                       71058    2026-04-14
+\Sales_25-26_1667.pdf                                                                 44428    2026-04-14
+\Sales_25-26_1670.pdf                                                                 44323    2026-04-14
+\Sales_25-26_296.pdf                                                                  44419    2026-04-14
+\Sales_25-26_3100.pdf                                                                 44364    2026-04-14
+\Sales_25-26_3112.pdf                                                                 44288    2026-04-14
+\Sales_25-26_3138.pdf                                                                 44432    2026-04-14
+\Sales_25-26_3869.pdf                                                                 44414    2026-04-14
+\Sales_25-26_4362.pdf                                                                 44364    2026-04-14
+\Sales_25-26_5074.pdf                                                                 44378    2026-04-14
+\Sales_25-26_5399.pdf                                                                 44389    2026-04-14
+\Sales_25-26_5399.zip                                                                 853489   2026-04-14
+\Sales_25-26_5920.pdf                                                                 44217    2026-04-14
+\Sales_25-26_6205.pdf                                                                 44216    2026-04-14
+\Sales_25-26_7015.pdf                                                                 44516    2026-04-14
+\Sales_25-26_7206.pdf                                                                 44303    2026-04-14
+\Sales_25-26_7495.pdf                                                                 44324    2026-04-14
+\Sales_25-26_7913.pdf                                                                 44406    2026-04-14
+\Sales_25-26_8005.pdf                                                                 44280    2026-04-14
+\Sales_25-26_8184.pdf                                                                 44369    2026-04-14
+\Sales_25-26_844.pdf                                                                  44528    2026-04-14
+\Sales_25-26_8515.pdf                                                                 44542    2026-04-14
+\Sales_MTCR-2526-01-21.pdf                                                            43943    2026-04-14
+\Sales_MTCR-2526-01-29.pdf                                                            43930    2026-04-14
+\Sales_MTCR-2526-02-22.pdf                                                            43931    2026-04-14
+\Sales_MTCR-2526-11-43.pdf                                                            43950    2026-04-14
+\Sales_MTX-2526-03-57.pdf                                                             43875    2026-04-14
+\Sales_MTX-2526-03-59.pdf                                                             43840    2026-04-14
+\Setup.exe                                                                            3360520  2026-02-05
+\STATMENT 25-26.PAMPATWAR                                                             9462     2026-04-14
+\tally.exe                                                                            17961152 2026-02-05
+\tally.ini                                                                            2514     2026-10-17
+\Tally.pdf                                                                            1984     2026-03-07
+\tally.rew                                                                            156      2026-09-08
+\tally2.dmp                                                                           272654   2026-06-25
+\tally3.dmp                                                                           258901   2026-07-02
+\tally4.dmp                                                                           290126   2026-07-04
+\tally5.dmp                                                                           273860   2026-07-04
+\tally6.dmp                                                                           245693   2026-07-04
+\tallyapp.dat                                                                         12052715 2026-02-05
+\tallycfg.tsf                                                                         624605   2026-10-17
+\tallyerr.log                                                                         12586    2026-07-04
+\tallygateway.ini                                                                     77       2026-02-05
+\tallygatewayserver.exe                                                               4261568  2026-02-05
+\tallyhttp.log                                                                        1660184  2026-07-06
+\tallymigrationtool.exe                                                               21274304 2026-02-05
+\TallyPrime.rar                                                                       854090   2026-04-14
+\tallyres.dat                                                                         55527424 2026-02-05
+\tallyscheduler.exe                                                                   5502144  2026-02-05
+\tallywin.dat                                                                         2687384  2026-02-05
+\tdlfunc.log                                                                          126      2026-04-03
+\U.L.GrpIntr.pdf                                                                      1858     2026-03-26
+\appdata\notifications                                                                         2026-10-26
+\appdata\scheduler                                                                             2026-10-26
+\appdata\notifications\AppNotification.1800                                           3072     2026-10-17
+\appdata\notifications\AppNotifMetaData.1800                                          1024     2026-02-05
+\appdata\notifications\TAPPNOTIFACCESS.TSF                                            512      2026-10-26
+\appdata\notifications\TAPPNOTIFMESSAGE.TSF                                           512      2026-10-26
+\appdata\notifications\TAPPNOTIFSTATE.TSF                                             5632     2026-10-26
+\appdata\notifications\TAPPNOTIFUPDATE.TSF                                            4096     2026-10-17
+\appdata\scheduler\SchMetaData.1800                                                   1024     2026-02-05
+\appdata\scheduler\TSCHACCESS.TSF                                                     512      2026-10-26
+\appdata\scheduler\TSCHEXCL.TSF                                                       0        2026-02-05
+\appdata\scheduler\TSCHMESSAGE.TSF                                                    512      2026-10-26
+\appdata\scheduler\TSCHSTATE.TSF                                                      5632     2026-10-26
+\appdata\scheduler\TSCHUPDATE.TSF                                                     2560     2026-02-05
+\appresources\find                                                                             2026-02-06
+\appresources\plugins                                                                          2026-07-21
+\appresources\find\history.txt                                                        16       2026-10-17
+\appresources\plugins\GSTonTobacco                                                             2026-07-04
+\appresources\plugins\TallyCapital                                                             2026-03-23
+\appresources\plugins\TallyIra                                                                 2026-07-21
+\capsules\00031-29327.cap                                                             3362056  2026-06-30
+\capsules\00047-29327.cap                                                             62339873 2026-06-30
+\capsules\21503-00744.cap                                                             29752    2026-03-19
+\capsules\21504-00533.cap                                                             25656    2026-04-24
+\capsules\21601-00123.cap                                                             2104     2026-09-08
+\capsules\26000-00120.cap                                                             55864    2026-05-11
+\capsules\26000-00121.cap                                                             55864    2026-05-14
+\capsules\26000-00136.cap                                                             57400    2026-09-08
+\capsules\tally.cif                                                                   212      2025-12-20
+\capsules\tally.dif                                                                   139      2025-12-20
+\capsules\tally.oif                                                                   10092    2026-09-08
+\capsules\tally.tip                                                                   61277258 2026-02-05
+\capsules\TP-1-1-7-1-0-29327.cif                                                      212      2026-06-30
+\capsules\TP-1-1-7-1-0-29327.dif                                                      139      2026-06-30
+\capsules\updates.tuf                                                                 568      2026-10-17
+\config\reportviews                                                                            2026-02-05
+\config\scheduler                                                                              2026-02-05
+\config\reportviews\GSTR HSNSACSummaryStaticsGSTR-1  -  HSN0SAC Summary - My View.tsf 50189    2021-09-04
+\config\scheduler\tallyschedulercfg.tsf                                               384      2026-10-17
+\lang\0000arabic.dct                                                                  16856    2025-12-20
+\logs\tallyscheduler.log                                                              7489390  2026-10-26
+
+
+

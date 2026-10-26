@@ -1,0 +1,22 @@
+node_modules/
+dist/
+target/
+.turbo/
+*.log
+*.db
+*.db-journal
+.env*
+
+# Never commit real client data — only fixtures/ may hold sample files
+*.xlsx
+*.xls
+*.csv
+*.pdf
+*.xml
+!fixtures/**
+!packages/**/__snapshots__/**
+
+# research: anonymised captures are committed; raw/private material never is
+research/_private/
+!research/**/*.xml
+!research/**/*.csv

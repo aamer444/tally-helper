@@ -1,0 +1,662 @@
+﻿# TallyPrime 6.2  (E:\TallyPrime6.0)
+
+## Executables
+
+Name                     Length Version
+----                     ------ -------
+Setup.exe               3326728 1.1.6.2
+tally.exe              17026752 1.1.6.2
+tallygatewayserver.exe  4253888 1.1.7.1
+
+
+
+## Folder tree (depth 2, company data excluded)
+
+Path                                                                                  Length    Modified  
+----                                                                                  ------    --------  
+\appresources                                                                                   2026-01-24
+\capsules                                                                                       2026-10-23
+\config                                                                                         2025-05-10
+\Data                                                                                           2025-10-31
+\lang                                                                                           2025-10-31
+\062024_27BDGPS4654C1ZG_GSTR2BQ_19122025.xlsx                                         40871     2025-12-19
+\092024_27ASNPB6739N1Z3_GSTR2B_13102025.xlsx                                          44677     2025-10-13
+\27AADFB5366P1ZY_GSTR1_APR-2026_12052026_064312.xlsx                                  54274     2026-05-12
+\27AADFB5366P1ZY_GSTR1_DEC-2025_09012026_165235.xlsx                                  54251     2026-01-09
+\27AADFB5366P1ZY_GSTR1_FEB-2026_06032026_120540.xlsx                                  54571     2026-03-06
+\27AADFB5366P1ZY_GSTR1_JAN-2026_09022026_205640.xlsx                                  54034     2026-02-09
+\27AADFB5366P1ZY_GSTR1_JUN-2026_08072026_082616.xlsx                                  54683     2026-07-08
+\27AADFB5366P1ZY_GSTR1_MAR-2026_09042026_123026.xlsx                                  53826     2026-04-09
+\27AADFB5366P1ZY_GSTR1_MAY-2026_18062026_122101.xlsx                                  53980     2026-06-18
+\27AAKFA9099B1Z7_GSTR1_OCT-DEC-2025_12122025_122911.xlsx                              53679     2025-12-12
+\27AAKFA9099B1Z7_GSTR1_OCT-DEC-2025_13012026_125343.xlsx                              53193     2026-01-13
+\27AAOPV3427C1ZJ_GSTR1_APR-2026_09052026_194417.xlsx                                  55311     2026-05-09
+\27AAOPV3427C1ZJ_GSTR1_DEC-2025_10012026_094619.xlsx                                  54490     2026-01-10
+\27AAOPV3427C1ZJ_GSTR1_FEB-2026_10032026_154732.xlsx                                  54112     2026-03-10
+\27AAOPV3427C1ZJ_GSTR1_JAN-2026_11022026_173816.xlsx                                  55682     2026-02-11
+\27AAOPV3427C1ZJ_GSTR1_JUN-2026_10072026_154914.xlsx                                  56778     2026-07-10
+\27AAOPV3427C1ZJ_GSTR1_MAR-2026_11042026_100321.xlsx                                  54905     2026-04-11
+\27AAOPV3427C1ZJ_GSTR1_MAY-2026_10062026_180523.xlsx                                  55952     2026-06-10
+\27AAOPV3431G1ZF_GSTR1(Delete)_MAR-2026_06042026_121252.json                          10059     2026-04-06
+\27AAOPV3431G1ZF_GSTR1_APR-2026_09052026_193022.xlsx                                  60516     2026-05-09
+\27AAOPV3431G1ZF_GSTR1_FEB-2026_05032026_120240.xlsx                                  57739     2026-03-05
+\27AAOPV3431G1ZF_GSTR1_JAN-2026_06022026_234149.xlsx                                  61145     2026-02-06
+\27AAOPV3431G1ZF_GSTR1_JUN-2026_06072026_223126.xlsx                                  62832     2026-07-06
+\27AAOPV3431G1ZF_GSTR1_MAR-2026_06042026_121252.json                                  32011     2026-04-06
+\27AAOPV3431G1ZF_GSTR1_MAR-2026_06042026_121348.xlsx                                  62984     2026-04-06
+\27AAOPV3431G1ZF_GSTR1_MAY-2026_04062026_183318.xlsx                                  62848     2026-06-04
+\27AAPPM8227J1Z4_GSTR1_OCT-DEC-2025_12122025_122807.xlsx                              52667     2025-12-12
+\27AAPPM8227J1Z4_GSTR1_OCT-DEC-2025_13012026_131003.xlsx                              54546     2026-01-13
+\27AARPK2732J2ZD_GSTR1_FEB-2026_10032026_115708.xlsx                                  51578     2026-03-10
+\27AARPK2732J2ZD_GSTR1_FEB-2026_10032026_115801.json                                  830       2026-03-10
+\27AARPK2732J2ZD_GSTR1_JAN-2026_09022026_174612.xlsx                                  52147     2026-02-09
+\27AARPK2732J2ZD_GSTR1_JAN-2026_09022026_174658.json                                  2413      2026-02-09
+\27AARPK2732J2ZD_GSTR1_JUN-2026_09072026_174008.xlsx                                  51502     2026-07-09
+\27AARPK2732J2ZD_GSTR1_JUN-2026_09072026_174047.json                                  593       2026-07-09
+\27AARPK2732J2ZD_GSTR1_MAR-2026_11042026_125952.json                                  587       2026-04-11
+\27AARPK2732J2ZD_GSTR1_MAY-2026_08062026_124808.xlsx                                  51931     2026-06-08
+\27AARPK2732J2ZD_GSTR1_MAY-2026_08062026_124846.json                                  1729      2026-06-08
+\27AARPK2738C1ZN_GSTR1_APR-2026_18052026_161038.xlsx                                  52212     2026-05-18
+\27AARPK2738C1ZN_GSTR1_APR-2026_23052026_132920.xlsx                                  52260     2026-05-23
+\27AARPK2738C1ZN_GSTR1_DEC-2025_20012026_185131.xlsx                                  51998     2026-01-20
+\27AARPK2738C1ZN_GSTR1_FEB-2026_19032026_150047.xlsx                                  52154     2026-03-19
+\27AARPK2738C1ZN_GSTR1_JAN-2026_20022026_112625.xlsx                                  51970     2026-02-20
+\27AARPK2738C1ZN_GSTR1_JUN-2026_18072026_193532.xlsx                                  51904     2026-07-18
+\27AIXPV6671R1ZM_GSTR1_APR-2026_10052026_080326.xlsx                                  54927     2026-05-10
+\27AIXPV6671R1ZM_GSTR1_FEB-2026_10032026_160706.xlsx                                  54521     2026-03-10
+\27AIXPV6671R1ZM_GSTR1_JAN-2026_10022026_160035.xlsx                                  61476     2026-02-10
+\27AIXPV6671R1ZM_GSTR1_JUN-2026_09072026_180836.xlsx                                  60720     2026-07-09
+\27AIXPV6671R1ZM_GSTR1_MAR-2026_11042026_134811.xlsx                                  58889     2026-04-11
+\27AIXPV6671R1ZM_GSTR1_MAR-2026_11042026_140426.xlsx                                  58890     2026-04-11
+\27AIXPV6671R1ZM_GSTR1_MAY-2026_09062026_124943.xlsx                                  57032     2026-06-09
+\27AIXPV6671R1ZM_GSTR1_NOV-2025_10122025_165325.xlsx                                  59574     2025-12-10
+\27AJTPT9867G1Z1_GSTR1_OCT-DEC-2025_16012026_113814.xlsx                              52307     2026-01-16
+\27AKQPB3911K1Z2_GSTR1_APR-2026_23052026_071516.xlsx                                  52176     2026-05-23
+\27AKQPB3911K1Z2_GSTR1_DEC-2025_10012026_161030.xlsx                                  53424     2026-01-15
+\27AKQPB3911K1Z2_GSTR1_DEC-2025_15012026_205749.xlsx                                  52307     2026-01-15
+\27AKQPB3911K1Z2_GSTR1_FEB-2026_16022026_102301.xlsx                                  52304     2026-02-16
+\27AKQPB3911K1Z2_GSTR1_JUL-2026_20072026_122837.xlsx                                  52207     2026-07-20
+\27AKQPB3911K1Z2_GSTR1_NOV-2025_16122025_122820.xlsx                                  52245     2025-12-16
+\27ARJPJ5325M1ZF_GSTR1_APR-2026_22052026_090108.xlsx                                  60493     2026-05-22
+\27ARJPJ5325M1ZF_GSTR1_DEC-2025_10012026_153133.xlsx                                  59264     2026-01-10
+\27ARJPJ5325M1ZF_GSTR1_FEB-2026_11032026_132553.xlsx                                  58867     2026-03-11
+\27ARJPJ5325M1ZF_GSTR1_FEB-2026_11032026_133126.json                                  18327     2026-03-11
+\27ARJPJ5325M1ZF_GSTR1_JAN-2026_11022026_174515.xlsx                                  59453     2026-02-11
+\27ARJPJ5325M1ZF_GSTR1_JUN-2026_10072026_185523.xlsx                                  62559     2026-07-10
+\27ARJPJ5325M1ZF_GSTR1_MAR-2026_11042026_155810.xlsx                                  58941     2026-04-11
+\27ARJPJ5325M1ZF_GSTR1_NOV-2025_22122025_172102.xlsx                                  58223     2025-12-22
+\27ASNPB6739N1Z3_GSTR1_JAN-MAR-2026_24042026_185955.xlsx                              52019     2026-04-24
+\27ASNPB6739N1Z3_GSTR1_OCT-DEC-2025_25012026_180315.xlsx                              51817     2026-01-25
+\27AXDPB4744Q1Z4_GSTR1_APR-JUN-2026_08062026_175824.xlsx                              52638     2026-06-08
+\27AXDPB4744Q1Z4_GSTR1_APR-JUN-2026_13072026_123138.xlsx                              58968     2026-07-13
+\27AXDPB4744Q1Z4_GSTR1_JAN-MAR-2026_13042026_112018.json                              27384     2026-04-13
+\27AXDPB4744Q1Z4_GSTR1_JAN-MAR-2026_13042026_112225.xlsx                              62418     2026-04-13
+\27AXDPB4744Q1Z4_GSTR1_OCT-DEC-2025_12012026_222124.xlsx                              59558     2026-01-12
+\27AZAPP9592R1Z7_GSTR1_JAN-MAR-2026_23042026_085049.xlsx                              55095     2026-04-23
+\27AZAPP9592R1Z7_GSTR1_OCT-DEC-2025_22012026_123421.xlsx                              54199     2026-01-22
+\27BDGPS4654C1ZG_GSTR1_APR-JUN-2026_20072026_135921.xlsx                              52538     2026-07-20
+\27BDGPS4654C1ZG_GSTR1_JAN-MAR-2026_21042026_153856.json                              3820      2026-04-21
+\27BDGPS4654C1ZG_GSTR1_JAN-MAR-2026_21042026_153928.xlsx                              53136     2026-04-21
+\27DTQPK0630C1ZV_GSTR1_AUG-2025_29012026_175837.xlsx                                  68680     2026-01-29
+\27DTQPK0630C1ZV_GSTR1_DEC-2025_01052026_122452.xlsx                                  74471     2026-05-01
+\27DTQPK0630C1ZV_GSTR1_FEB-2026_19062026_102012.xlsx                                  69176     2026-06-19
+\27DTQPK0630C1ZV_GSTR1_JAN-2026_01062026_083405.xlsx                                  72523     2026-06-01
+\27DTQPK0630C1ZV_GSTR1_MAR-2026_11072026_145229.xlsx                                  70433     2026-07-11
+\27DTQPK0630C1ZV_GSTR1_NOV-2025_10042026_075014.xlsx                                  70356     2026-04-10
+\27DTQPK0630C1ZV_GSTR1_OCT-2025_27032026_071414.xlsx                                  71242     2026-03-27
+\27DTQPK0630C1ZV_GSTR1_SEP-2025_18022026_114717.xlsx                                  73644     2026-02-18
+\27OGOPS1977J1Z6_GSTR1_APR-JUN-2026_20072026_180827.xlsx                              51960     2026-07-20
+\31.3.25.BSheet.pdf                                                                   3014      2025-10-22
+\31.3.25.PandL.pdf                                                                    4228      2025-10-22
+\A.A.CHUNAWALA.GSTR-1 - HSN SAC Summary.xlsx                                          11716     2025-12-03
+\A.RAZZAQ.GrpSum.pdf                                                                  1789      2025-09-24
+\AA AFAK PATEL  Tally.pdf                                                             1572      2025-07-07
+\AA NASREEN Tally.pdf                                                                 1580      2025-07-07
+\AA RAHEEMA Tally.pdf                                                                 1569      2025-07-07
+\AJMER SALE JUNE Accounting Voucher.pdf                                               44561     2025-07-12
+\BHARAT.GSTR-1 Reconciliation - HSN SAC Summary.xlsx                                  11189     2025-11-30
+\BSheet.pdf                                                                           2386      2025-09-24
+\capital.GrpSum.pdf                                                                   1695      2025-10-30
+\capital.GrpSum.xlsx                                                                  10090     2025-10-30
+\clientlicinfo.tsf                                                                    568       2026-10-23
+\dep.saniya traders .GrpSum.xlsx                                                      10439     2025-09-13
+\Eazy Auto Vch_Abhi (5).tcp                                                           869944    2023-10-19
+\FAISAL ENTERPRISES - HSN SAC Summary.xlsx                                            11138     2025-11-26
+\faisal.StkGrpSum.xlsx                                                                11207     2025-11-29
+\FIX ASSEST.GrpSum.pdf                                                                1502      2025-10-12
+\goodwill Tally.pdf                                                                   4123      2025-10-23
+\groci.BSheet.pdf                                                                     1793      2025-10-22
+\GrpSum.pdf                                                                           1501      2025-09-24
+\GrpSum.xlsx                                                                          17673     2025-09-24
+\GSTR-1 - HSN AKOLAWLA 24-25.xlsx                                                     11459     2025-11-25
+\GSTR-1 - HSN SAC Summary (B2B - B2C Supplies).xlsx                                   22210     2025-11-13
+\GSTR-1 - HSN SAC Summary.xlsx                                                        13682     2025-11-30
+\GSTR-3B.xlsx                                                                         12700     2025-11-30
+\JAIN SUPER.Tally.pdf                                                                 4812      2025-09-07
+\KANDHARKAR STO   GSTR-3B.pdf                                                         1798      2025-10-17
+\KANDHARKAR STOTE Tally.pdf                                                           1686      2025-08-18
+\LicServer.tsf                                                                        568       2026-10-26
+\M.A.24-25.BSheet.pdf                                                                 3216      2025-10-31
+\M.A.AMD.DayBook.xlsx                                                                 10578     2025-11-13
+\M.A.SHARIF.Tally.pdf                                                                 2640      2025-10-23
+\m.e.DayBook.pdf                                                                      53521     2025-07-30
+\M.E.GrpSum.xlsx                                                                      9568      2025-12-01
+\MAHA..pdf                                                                            2013      2025-10-01
+\MAHARUDRA Tally.pdf                                                                  42346     2025-10-01
+\MD ASHFAQ.Tally.pdf                                                                  2154      2025-10-22
+\md yaqub GrpSum.pdf                                                                  1741      2025-09-24
+\MD YASIN.pdf                                                                         55897     2025-09-03
+\MD ZAKIR.Tally.pdf                                                                   2165      2025-10-22
+\MEJBAAN PandL.pdf                                                                    2392      2025-10-12
+\MEJHBAAN BSheet.pdf                                                                  2439      2025-10-12
+\METRO.GSTR-1 - HSN SAC Summary.xlsx                                                  11888     2025-11-30
+\METRO.GSTR-3B.xlsx                                                                   13980     2025-11-30
+\NASIR HU,.pdf                                                                        56103     2025-09-03
+\NASIR HUS..Tally.pdf                                                                 65823     2025-08-09
+\New Anita_25-26-31.pdf                                                               2458      2025-11-14
+\NEW G GSTR-3B.xlsx                                                                   14142     2025-12-01
+\NG.GSTR-1 - HSN SAC Summary.xlsx                                                     34491     2025-12-01
+\old mejPandL.pdf                                                                     2448      2025-09-24
+\P.GSTR-1 - HSN SAC Summary.xlsx                                                      19648     2025-11-29
+\PandL.pdf                                                                            2378      2025-09-24
+\RAHAT BHAI.GrpSum.pdf                                                                1691      2025-09-24
+\RAHAT.BHAI.GrpSum.pdf                                                                1691      2025-10-12
+\RAZZAK SAB.GrpSum.pdf                                                                1789      2025-10-12
+\rcm bha.Tally.xlsx                                                                   10362     2025-12-06
+\returns_02122025_R2A_27AADFB5366P1ZY_R2A_others_0.zip                                2543      2025-12-04
+\returns_02122025_R2A_27AAOPV3427C1ZJ_R2A_others_0.zip                                3283      2025-12-04
+\returns_02122025_R2A_27AAOPV3431G1ZF_R2A_others_0.zip                                13168     2025-12-02
+\returns_02122025_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                15780     2025-12-02
+\returns_04082026_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                21628     2026-08-04
+\returns_04092025_R2A_27AAOPV3431G1ZF_R2A_others_0.zip                                73122     2025-09-04
+\returns_04092025_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                14278     2025-09-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (10).zip                           26975     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (11).zip                           26975     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (12).zip                           20263     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (13).zip                           21842     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (2).zip                            13618     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (3).zip                            9310      2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (4).zip                            224370    2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (5).zip                            21647     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (6).zip                            21455     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (7).zip                            28303     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (8).zip                            21842     2025-10-04
+\returns_04102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (9).zip                            20263     2025-10-04
+\returns_05022026_R2A_27AAOPV3427C1ZJ_R2A_others_0.zip                                3165      2026-02-05
+\returns_05022026_R2A_27AIXPV6671R1ZM_R2A_others_0.zip                                16482     2026-02-05
+\returns_07112025_R2A_27ARJPJ5325M1ZF_R2A_others_0.zip                                6799      2025-11-07
+\returns_08042026_R2A_27ARJPJ5325M1ZF_R2A_others_0 (1).zip                            6885      2026-04-11
+\returns_19102025_R1_27ARJPJ5325M1ZF_offline_others_0.zip                             7264      2025-10-19
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (1).zip                         6840      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (10).zip                        4646      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (11).zip                        5911      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (2).zip                         5809      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (3).zip                         5433      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (4).zip                         5556      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (5).zip                         4816      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (6).zip                         5238      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (7).zip                         5598      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (8).zip                         5235      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0 (9).zip                         6082      2025-10-20
+\returns_20102025_R1_27AKQPB3911K1Z2_offline_others_0.zip                             6455      2025-10-20
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (1).zip                            21682     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (10).zip                           26952     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (2).zip                            28530     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (3).zip                            21862     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (4).zip                            20284     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (5).zip                            27209     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (6).zip                            20989     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (7).zip                            22599     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (8).zip                            22599     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0 (9).zip                            28195     2025-08-23
+\returns_21082025_R2A_27AKQPB3911K1Z2_R2A_others_0.zip                                21647     2025-08-23
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (1).zip                         16150     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (10).zip                        16642     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (11).zip                        15497     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (12).zip                        15895     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (13).zip                        16659     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (2).zip                         15432     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (3).zip                         16408     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (4).zip                         16408     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (5).zip                         16408     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (6).zip                         17558     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (7).zip                         17837     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (8).zip                         18117     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0 (9).zip                         15933     2025-10-28
+\returns_26102025_R1_27DTQPK0630C1ZV_offline_others_0.zip                             16633     2025-10-28
+\returns_29062025_R2A_27AKQPB3911K1Z2_R2A_others_0 (1).zip                            13288     2025-06-30
+\returns_29062025_R2A_27AKQPB3911K1Z2_R2A_others_0 (2).zip                            9250      2025-06-30
+\returns_29062025_R2A_27AKQPB3911K1Z2_R2A_others_0 (3).zip                            13619     2025-06-30
+\returns_29062025_R2A_27AKQPB3911K1Z2_R2A_others_0 (4).zip                            8645      2025-06-30
+\returns_29062025_R2A_27AKQPB3911K1Z2_R2A_others_0 (5).zip                            8645      2025-06-30
+\returns_29062025_R2A_27AKQPB3911K1Z2_R2A_others_0 (6).zip                            8840      2025-06-30
+\returns_29062025_R2A_27AKQPB3911K1Z2_R2A_others_0.zip                                11269     2025-06-30
+\returns_31102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (1).zip                            22854     2025-10-31
+\returns_31102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (2).zip                            29328     2025-10-31
+\returns_31102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (3).zip                            27716     2025-10-31
+\returns_31102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (4).zip                            21253     2025-10-31
+\returns_31102025_R2A_27AKQPB3911K1Z2_R2A_others_0 (5).zip                            29317     2025-10-31
+\returns_31102025_R2A_27AKQPB3911K1Z2_R2A_others_0.zip                                20985     2025-10-31
+\returns_R2BQ_27AAKFA9099B1Z7_062025.json                                             54094     2025-07-18
+\returns_R2BQ_27AIXPV6671R1ZM_062024.json                                             493348    2025-12-06
+\returns_R2BQ_27AIXPV6671R1ZM_092024.json                                             419623    2025-12-06
+\returns_R2BQ_27AKQPB3911K1Z2_062024.json                                             417949    2025-10-18
+\returns_R2BQ_27ARJPJ5325M1ZF_062024.json                                             256341    2025-10-13
+\returns_R2BQ_27ARJPJ5325M1ZF_092024.json                                             295710    2025-10-13
+\returns_R2BQ_27ASNPB6739N1Z3_032025.json                                             65971     2025-10-13
+\returns_R2BQ_27ASNPB6739N1Z3_062024.json                                             80109     2025-10-13
+\returns_R2BQ_27ASNPB6739N1Z3_092025 (1).json                                         61780     2025-10-28
+\returns_R2BQ_27ASNPB6739N1Z3_122024.json                                             78419     2025-10-13
+\returns_R2BQ_27AXDPB4744Q1Z4_032025.json                                             293812    2025-05-20
+\returns_R2BQ_27AXDPB4744Q1Z4_062024 (1).json                                         341631    2025-05-20
+\returns_R2BQ_27AXDPB4744Q1Z4_062024.json                                             341631    2025-05-20
+\returns_R2BQ_27AXDPB4744Q1Z4_092024.json                                             524398    2025-05-20
+\returns_R2BQ_27AXDPB4744Q1Z4_092025 (1).json                                         320542    2025-11-08
+\returns_R2BQ_27AXDPB4744Q1Z4_122024.json                                             426056    2025-05-20
+\returns_R2BQ_27AZAPP9592R1Z7_032025 (1).json                                         45205     2025-10-18
+\returns_R2BQ_27AZAPP9592R1Z7_032025.json                                             45205     2025-10-13
+\returns_R2BQ_27AZAPP9592R1Z7_062024 (1).json                                         43292     2025-10-18
+\returns_R2BQ_27AZAPP9592R1Z7_062024.json                                             43292     2025-10-13
+\returns_R2BQ_27AZAPP9592R1Z7_092024 (1).json                                         69989     2025-10-18
+\returns_R2BQ_27AZAPP9592R1Z7_092024.json                                             69989     2025-10-13
+\returns_R2BQ_27AZAPP9592R1Z7_122024 (1).json                                         45468     2025-10-18
+\returns_R2BQ_27AZAPP9592R1Z7_122024.json                                             45468     2025-10-13
+\returns_R2BQ_27BDGPS4654C1ZG_032025.json                                             29741     2025-12-19
+\returns_R2BQ_27BDGPS4654C1ZG_062024.json                                             32279     2025-12-19
+\returns_R2BQ_27BDGPS4654C1ZG_092024.json                                             34798     2025-12-19
+\returns_R2BQ_27BDGPS4654C1ZG_122024.json                                             38700     2025-12-19
+\returns_R2B_27AAOPV3431G1ZF_102025.json                                              115855    2025-11-14
+\returns_R2B_27AIXPV6671R1ZM_082025.json                                              109057    2025-09-16
+\returns_R2B_27AIXPV6671R1ZM_102025 (1).json                                          124200    2025-11-16
+\returns_R2B_27AKQPB3911K1Z2_012025.json                                              235975    2025-10-18
+\returns_R2B_27AKQPB3911K1Z2_022025 (1).json                                          213924    2025-10-18
+\returns_R2B_27AKQPB3911K1Z2_032025 (2).json                                          233599    2025-10-18
+\returns_R2B_27AKQPB3911K1Z2_092024 (1).json                                          133485    2025-10-18
+\returns_R2B_27AKQPB3911K1Z2_102024 (2).json                                          214030    2025-10-18
+\returns_R2B_27AKQPB3911K1Z2_112024 (2).json                                          232958    2025-10-18
+\returns_R2B_27AKQPB3911K1Z2_122024 (4).json                                          229420    2025-10-18
+\returns_R2B_27ARJPJ5325M1ZF_012025.json                                              85825     2025-10-13
+\returns_R2B_27ARJPJ5325M1ZF_022025.json                                              93641     2025-10-13
+\returns_R2B_27ARJPJ5325M1ZF_032025.json                                              69699     2025-10-13
+\returns_R2B_27ARJPJ5325M1ZF_082025.json                                              74629     2025-09-16
+\returns_R2B_27ARJPJ5325M1ZF_102024.json                                              76961     2025-10-13
+\returns_R2B_27ARJPJ5325M1ZF_102025.json                                              79249     2025-11-18
+\returns_R2B_27ARJPJ5325M1ZF_112024.json                                              67403     2025-10-13
+\returns_R2B_27ARJPJ5325M1ZF_112025.json                                              81941     2025-12-20
+\returns_R2B_27ARJPJ5325M1ZF_122024.json                                              96080     2025-10-13
+\returns_R2B_27ASNPB6739N1Z3_092024.json                                              24875     2025-10-13
+\returns_R2B_27DTQPK0630C1ZV_042025.json                                              16626     2026-04-09
+\returns_R2B_27DTQPK0630C1ZV_052025.json                                              16686     2026-04-09
+\returns_R2B_27DTQPK0630C1ZV_062025.json                                              19534     2026-04-09
+\returns_R2B_27DTQPK0630C1ZV_072025.json                                              21198     2026-04-09
+\returns_R2B_27DTQPK0630C1ZV_082025.json                                              21849     2026-04-09
+\returns_R2B_27DTQPK0630C1ZV_092025.json                                              18735     2026-04-09
+\returns_R2B_27DTQPK0630C1ZV_102025.json                                              17477     2026-04-09
+\Sales_24_25CR-1437.xlsx                                                              13790     2025-11-29
+\Sales_25-26-103.pdf                                                                  44115     2025-08-23
+\Sales_25-26-104.pdf                                                                  44118     2025-08-23
+\Sales_25-26-71.pdf                                                                   44106     2025-08-24
+\Sales_25-26-74.pdf                                                                   44102     2025-08-24
+\Sales_25-26-84.pdf                                                                   45749     2025-08-17
+\Sales_CR_26.pdf                                                                      85109     2025-07-26
+\Sales_NGT_25-26-14.pdf                                                               70772     2025-11-14
+\Sales_NGT_25-26-28.pdf                                                               70881     2025-11-14
+\Sales_NGT_25-26-30.pdf                                                               70864     2025-11-14
+\Sales_NGT_25-26-31.pdf                                                               70893     2025-11-14
+\Sales_NGT_25-26-32.pdf                                                               70375     2025-08-04
+\Sales_NGT_25-26-33.pdf                                                               70861     2025-08-04
+\Sales_NGT_25-26-34.pdf                                                               70484     2025-08-04
+\Sales_NGT_25-26-35.pdf                                                               70543     2025-08-04
+\Sales_NGT_25-26-36.pdf                                                               70679     2025-08-04
+\Sales_NGT_25-26-37.pdf                                                               70408     2025-08-04
+\Sales_NGT_25-26-38.pdf                                                               70994     2025-08-04
+\Sales_NGT_25-26-51.pdf                                                               44047     2025-09-27
+\Sales_NGT_25-26-54.pdf                                                               44436     2025-11-14
+\Sales_NGT_25-26-55.pdf                                                               69021     2025-11-14
+\Sales_NGT_25-26-56.pdf                                                               71252     2025-11-14
+\Sales_NGT_25-26-57.pdf                                                               70594     2025-11-14
+\Sales_NGT_25-26-58.pdf                                                               71243     2025-11-14
+\Sales_NGT_25-26-59.pdf                                                               68974     2025-11-14
+\Sales_NGT_25-26-60.pdf                                                               70829     2025-11-14
+\Sales_NGT_25-26-61.pdf                                                               70646     2025-11-14
+\Sales_NGT_25-26-62.pdf                                                               71204     2025-11-14
+\Sales_NGT_25-26-63.pdf                                                               70492     2025-11-14
+\Sales_NGT_25-26-64.pdf                                                               71301     2025-11-14
+\Sales_NGT_25-26-65.pdf                                                               70979     2025-11-14
+\Sales_NGT_25-26-66.pdf                                                               68903     2025-11-14
+\Sales_NGT_25-26-67.pdf                                                               69054     2025-11-14
+\Sales_NGT_25-26-68.pdf                                                               71032     2025-11-14
+\Sales_SNE-25-26-3.pdf                                                                43950     2025-08-26
+\Sales_SNE-25-26-4.pdf                                                                44083     2025-08-26
+\SEP.Tally.pdf                                                                        84585     2025-10-10
+\Setup.exe                                                                            3326728   2025-10-31
+\SHIV HARD. Tally.pdf                                                                 1939      2025-12-03
+\SHOBA TRA..GSTR-3B.pdf                                                               2036      2025-10-17
+\SHRI NARSINH.GSTR-1 - HSN SAC Summary.xlsx                                           14556     2025-12-02
+\shri salasar Tally.pdf                                                               2211      2025-08-07
+\SHRI SALASAR TI.  Tally.pdf                                                          2258      2025-08-07
+\SHRI SALASAR TIL  24-25 Tally.pdf                                                    5318      2025-08-07
+\SMA.24-25.PandL.pdf                                                                  3129      2025-10-31
+\StkSum.xlsx                                                                          11884     2025-09-19
+\SUN.GrpSum.pdf                                                                       1826      2025-10-12
+\tally.exe                                                                            17026752  2025-10-31
+\tally.imp                                                                            1425234   2026-07-14
+\tally.ini                                                                            1564      2026-10-23
+\tally.rew                                                                            150       2026-07-24
+\Tally.xlsx                                                                           13641     2025-12-02
+\tally1.dmp                                                                           302634    2026-07-08
+\tally3.dmp                                                                           357836    2026-06-24
+\tally4.dmp                                                                           286062    2026-06-25
+\tally5.dmp                                                                           323635    2026-07-03
+\tally6.dmp                                                                           275255    2026-07-04
+\tallyapp.dat                                                                         11882648  2025-10-31
+\tallycfg.tsf                                                                         634119    2025-12-06
+\tallyerr.log                                                                         60750     2026-07-29
+\tallygateway.ini                                                                     199       2026-10-26
+\tallygatewayserver.exe                                                               4253888   2026-07-18
+\tallygatewayserver1.dmp                                                              512553    2026-07-29
+\tallygatewayserver2.dmp                                                              0         2026-08-04
+\tallygatewayserver3.dmp                                                              0         2026-09-29
+\tallyhelp.html                                                                       14531     2026-02-05
+\tallyhttp.log                                                                        169715300 2026-07-14
+\tallyprime.lic                                                                       11320     2026-10-26
+\TallyPrime6.0.rar                                                                    599906    2025-11-14
+\tallyres.dat                                                                         55466496  2025-10-31
+\tallywin.dat                                                                         2688920   2025-10-31
+\TBK1800_010004.001                                                                   27366400  2025-06-26
+\TBK900_10007.001                                                                     7057920   2025-06-26
+\tdlfunc.log                                                                          14776     2026-04-03
+\VARALAXMI.Tally.pdf                                                                  8283      2025-09-07
+\YAKUB SETH.GrpSum.pdf                                                                1871      2025-10-12
+\ZA  NASRIN BA Tally.pdf                                                              1621      2025-07-07
+\ZA RAHIMA BANU.pdf                                                                   1609      2025-07-07
+\ZAKIR  HUMERA Tally.pdf                                                              1699      2025-07-07
+\ZAKIR  MD ASHFAK  Tally.pdf                                                          1443      2025-07-07
+\ZAKIR  MD ZAID  Tally.pdf                                                            1744      2025-07-07
+\appresources\plugins                                                                           2026-07-03
+\appresources\plugins\GSTonTobacco                                                              2026-07-03
+\appresources\plugins\TallyCapital                                                              2026-07-12
+\appresources\plugins\TallyIra                                                                  2026-07-21
+\capsules\00031-26873.cap                                                             3310280   2025-07-03
+\capsules\00031-27317.cap                                                             3326728   2025-10-31
+\capsules\00031-27958.cap                                                             3360520   2025-12-20
+\capsules\00031-27974.cap                                                             3360520   2026-02-05
+\capsules\00031-29027.cap                                                             3361544   2026-06-24
+\capsules\00031-29327.cap                                                             3362056   2026-06-28
+\capsules\00031-29802.cap                                                             3364616   2026-10-12
+\capsules\00047-26873.cap                                                             39145442  2025-07-03
+\capsules\00047-27317.cap                                                             39996581  2025-10-31
+\capsules\00047-27958.cap                                                             61267032  2025-12-20
+\capsules\00047-27974.cap                                                             61277258  2026-02-05
+\capsules\00047-29027.cap                                                             62036581  2026-06-24
+\capsules\00047-29327.cap                                                             62339873  2026-06-28
+\capsules\00047-29802.cap                                                             62565014  2026-10-12
+\capsules\20050-00112.cap                                                             3675781   2026-06-25
+\capsules\20052-00102.cap                                                             2505      2025-05-19
+\capsules\20054-00001.cap                                                             134       2026-07-18
+\capsules\21500-00323.cap                                                             14904     2025-07-29
+\capsules\21500-00324.cap                                                             14904     2025-08-01
+\capsules\21500-00326.cap                                                             14904     2025-08-11
+\capsules\21500-00327.cap                                                             14904     2025-08-17
+\capsules\21500-00332.cap                                                             14904     2025-10-06
+\capsules\21500-00334.cap                                                             14904     2025-10-15
+\capsules\21500-00335.cap                                                             14904     2025-10-19
+\capsules\21500-00336.cap                                                             14904     2025-10-25
+\capsules\21500-00339.cap                                                             15416     2025-11-07
+\capsules\21500-00343.cap                                                             15416     2025-12-02
+\capsules\21500-00344.cap                                                             15416     2025-12-09
+\capsules\21500-00345.cap                                                             15416     2025-12-10
+\capsules\21500-00350.cap                                                             15416     2025-12-27
+\capsules\21500-00351.cap                                                             15416     2026-01-06
+\capsules\21500-00356.cap                                                             15416     2026-02-05
+\capsules\21500-00373.cap                                                             15928     2026-04-30
+\capsules\21500-00377.cap                                                             15928     2026-06-06
+\capsules\21500-00378.cap                                                             15928     2026-07-03
+\capsules\21500-00379.cap                                                             15928     2026-07-18
+\capsules\21500-00380.cap                                                             15928     2026-08-07
+\capsules\21500-00381.cap                                                             16440     2026-08-10
+\capsules\21500-00384.cap                                                             16440     2026-09-02
+\capsules\21500-00385.cap                                                             16440     2026-09-10
+\capsules\21500-00386.cap                                                             16440     2026-09-25
+\capsules\21500-00387.cap                                                             16440     2026-10-11
+\capsules\21501-00134.cap                                                             5688      2025-07-29
+\capsules\21501-00136.cap                                                             5688      2025-10-25
+\capsules\21501-00138.cap                                                             6712      2025-11-14
+\capsules\21501-00141.cap                                                             6712      2026-01-04
+\capsules\21501-00142.cap                                                             8760      2026-03-27
+\capsules\21503-00739.cap                                                             29240     2025-07-05
+\capsules\21503-00740.cap                                                             29240     2025-07-26
+\capsules\21503-00741.cap                                                             29752     2025-09-27
+\capsules\21503-00742.cap                                                             29752     2025-11-19
+\capsules\21503-00744.cap                                                             29752     2025-12-02
+\capsules\21503-00745.cap                                                             29752     2026-08-21
+\capsules\21504-00526.cap                                                             24632     2025-06-26
+\capsules\21504-00527.cap                                                             25144     2025-07-09
+\capsules\21504-00530.cap                                                             25144     2025-07-25
+\capsules\21504-00532.cap                                                             25656     2025-07-31
+\capsules\21504-00533.cap                                                             25656     2025-08-07
+\capsules\21504-00536.cap                                                             25656     2026-05-11
+\capsules\21504-00537.cap                                                             25656     2026-07-04
+\capsules\21506-00218.cap                                                             11320     2025-08-30
+\capsules\21506-00219.cap                                                             11320     2026-01-26
+\capsules\21513-00122.cap                                                             4152      2025-07-31
+\capsules\21520-00391.cap                                                             16952     2026-01-03
+\capsules\21525-00133.cap                                                             5176      2025-08-01
+\capsules\21548-00130.cap                                                             3640      2025-10-18
+\capsules\21548-00133.cap                                                             4152      2026-04-22
+\capsules\21548-00135.cap                                                             4664      2026-07-15
+\capsules\21601-00123.cap                                                             2104      2025-06-28
+\capsules\21622-00124.cap                                                             3128      2025-10-08
+\capsules\21644-00124.cap                                                             3128      2025-09-16
+\capsules\21644-00125.cap                                                             3128      2026-09-28
+\capsules\21651-00122.cap                                                             1592      2025-12-21
+\capsules\21855-00122.cap                                                             1592      2025-08-20
+\capsules\21943-00113.cap                                                             1592      2025-09-24
+\capsules\21955-00114.cap                                                             2616      2025-09-29
+\capsules\26000-00055.cap                                                             51768     2025-07-02
+\capsules\26000-00056.cap                                                             51768     2025-07-05
+\capsules\26000-00058.cap                                                             51768     2025-07-23
+\capsules\26000-00059.cap                                                             52280     2025-07-29
+\capsules\26000-00060.cap                                                             52280     2025-08-01
+\capsules\26000-00062.cap                                                             52280     2025-08-11
+\capsules\26000-00064.cap                                                             52280     2025-08-16
+\capsules\26000-00066.cap                                                             52280     2025-08-30
+\capsules\26000-00067.cap                                                             52280     2025-09-08
+\capsules\26000-00068.cap                                                             52280     2025-09-10
+\capsules\26000-00071.cap                                                             52792     2025-09-30
+\capsules\26000-00072.cap                                                             52792     2025-10-13
+\capsules\26000-00074.cap                                                             52792     2025-10-15
+\capsules\26000-00075.cap                                                             53304     2025-10-19
+\capsules\26000-00076.cap                                                             53304     2025-10-25
+\capsules\26000-00077.cap                                                             53304     2025-10-28
+\capsules\26000-00078.cap                                                             53304     2025-11-02
+\capsules\26000-00079.cap                                                             53304     2025-11-06
+\capsules\26000-00083.cap                                                             53816     2025-11-28
+\capsules\26000-00084.cap                                                             53816     2025-12-04
+\capsules\26000-00085.cap                                                             53816     2025-12-10
+\capsules\26000-00088.cap                                                             53816     2025-12-19
+\capsules\26000-00090.cap                                                             53816     2025-12-27
+\capsules\26000-00091.cap                                                             54328     2026-01-01
+\capsules\26000-00094.cap                                                             54328     2026-01-16
+\capsules\26000-00095.cap                                                             54328     2026-01-21
+\capsules\26000-00097.cap                                                             54840     2026-01-29
+\capsules\26000-00103.cap                                                             54840     2026-02-23
+\capsules\26000-00106.cap                                                             54840     2026-03-01
+\capsules\26000-00109.cap                                                             55352     2026-03-24
+\capsules\26000-00110.cap                                                             55352     2026-03-26
+\capsules\26000-00111.cap                                                             55352     2026-04-03
+\capsules\26000-00116.cap                                                             55352     2026-04-23
+\capsules\26000-00117.cap                                                             55864     2026-04-30
+\capsules\26000-00118.cap                                                             55864     2026-05-01
+\capsules\26000-00119.cap                                                             55864     2026-05-06
+\capsules\26000-00120.cap                                                             55864     2026-05-09
+\capsules\26000-00121.cap                                                             55864     2026-05-13
+\capsules\26000-00124.cap                                                             56376     2026-06-06
+\capsules\26000-00127.cap                                                             56376     2026-07-03
+\capsules\26000-00129.cap                                                             56376     2026-07-11
+\capsules\26000-00130.cap                                                             56376     2026-07-21
+\capsules\26000-00131.cap                                                             56376     2026-07-23
+\capsules\26000-00132.cap                                                             56888     2026-08-06
+\capsules\26000-00133.cap                                                             56888     2026-08-10
+\capsules\26000-00136.cap                                                             57400     2026-09-02
+\capsules\26000-00137.cap                                                             57400     2026-09-10
+\capsules\26000-00138.cap                                                             57400     2026-09-24
+\capsules\26000-00139.cap                                                             57400     2026-09-25
+\capsules\26000-00140.cap                                                             57400     2026-09-29
+\capsules\26000-00141.cap                                                             57400     2026-10-01
+\capsules\26000-00142.cap                                                             57400     2026-10-07
+\capsules\26000-00143.cap                                                             57400     2026-10-09
+\capsules\26000-00144.cap                                                             57400     2026-10-13
+\capsules\26000-00145.cap                                                             57912     2026-10-24
+\capsules\42004-00137.cap                                                             5688      2025-09-08
+\capsules\42044-00116.cap                                                             3128      2026-01-16
+\capsules\tally.cif                                                                   216       2025-08-23
+\capsules\tally.dif                                                                   143       2025-08-23
+\capsules\tally.oif                                                                   10046     2026-07-11
+\capsules\tally.tip                                                                   39996581  2025-10-31
+\capsules\TE9-1-0-6-6-3-13763.cif                                                     13785     2025-08-28
+\capsules\TE9-1-0-6-6-3-13763.dif                                                     1091861   2025-08-28
+\capsules\TOC-01749.oif                                                               9556      2025-08-28
+\capsules\TOC-01750.oif                                                               9560      2025-08-30
+\capsules\TOC-01751.oif                                                               9563      2025-09-04
+\capsules\TOC-01752.oif                                                               9566      2025-09-09
+\capsules\TOC-01753.oif                                                               9581      2025-09-15
+\capsules\TOC-01754.oif                                                               9585      2025-09-24
+\capsules\TOC-01756.oif                                                               9605      2025-09-27
+\capsules\TOC-01757.oif                                                               9607      2025-10-02
+\capsules\TOC-01758.oif                                                               9607      2025-10-08
+\capsules\TOC-01761.oif                                                               9612      2025-10-15
+\capsules\TOC-01763.oif                                                               9613      2025-10-17
+\capsules\TOC-01764.oif                                                               9630      2025-10-17
+\capsules\TOC-01765.oif                                                               9636      2025-10-24
+\capsules\TOC-01766.oif                                                               9638      2025-10-28
+\capsules\TOC-01767.oif                                                               9634      2025-10-28
+\capsules\TOC-01768.oif                                                               9638      2025-10-30
+\capsules\TOC-01769.oif                                                               9654      2025-11-05
+\capsules\TOC-01770.oif                                                               9660      2025-11-13
+\capsules\TOC-01771.oif                                                               9662      2025-11-13
+\capsules\TOC-01772.oif                                                               9658      2025-11-19
+\capsules\TOC-01774.oif                                                               9665      2025-11-24
+\capsules\TOC-01775.oif                                                               9667      2025-11-26
+\capsules\TOC-01776.oif                                                               9666      2025-11-27
+\capsules\TOC-01777.oif                                                               9666      2025-11-28
+\capsules\TOC-01778.oif                                                               9667      2025-11-28
+\capsules\TOC-01783.oif                                                               9663      2025-12-03
+\capsules\TOC-01784.oif                                                               9666      2025-12-04
+\capsules\TOC-01785.oif                                                               9670      2025-12-10
+\capsules\TOC-01790.oif                                                               9726      2025-12-19
+\capsules\TOC-01791.oif                                                               9728      2025-12-23
+\capsules\TOC-01792.oif                                                               9728      2025-12-23
+\capsules\TOC-01793.oif                                                               9734      2025-12-25
+\capsules\TOC-01794.oif                                                               9740      2026-01-01
+\capsules\TOC-01795.oif                                                               9739      2026-01-02
+\capsules\TOC-01796.oif                                                               9740      2026-01-08
+\capsules\TOC-01797.oif                                                               9742      2026-01-14
+\capsules\TOC-01798.oif                                                               9752      2026-01-16
+\capsules\TOC-01799.oif                                                               9756      2026-01-20
+\capsules\TOC-01800.oif                                                               9778      2026-01-23
+\capsules\TOC-01801.oif                                                               9794      2026-01-29
+\capsules\TOC-01804.oif                                                               9801      2026-02-05
+\capsules\TOC-01806.oif                                                               9806      2026-02-11
+\capsules\TOC-01807.oif                                                               9805      2026-02-18
+\capsules\TOC-01809.oif                                                               9816      2026-02-20
+\capsules\TOC-01811.oif                                                               9813      2026-02-23
+\capsules\TOC-01812.oif                                                               9816      2026-02-25
+\capsules\TOC-01813.oif                                                               9816      2026-02-26
+\capsules\TOC-01814.oif                                                               9814      2026-03-01
+\capsules\TOC-01815.oif                                                               9821      2026-03-07
+\capsules\TOC-01818.oif                                                               9845      2026-03-15
+\capsules\TOC-01819.oif                                                               9843      2026-03-18
+\capsules\TOC-01820.oif                                                               9843      2026-03-23
+\capsules\TOC-01821.oif                                                               9844      2026-03-25
+\capsules\TOC-01823.oif                                                               9851      2026-04-03
+\capsules\TOC-01825.oif                                                               9853      2026-04-11
+\capsules\TOC-01827.oif                                                               9861      2026-04-13
+\capsules\TOC-01829.oif                                                               9863      2026-04-15
+\capsules\TOC-01834.oif                                                               9872      2026-04-21
+\capsules\TOC-01835.oif                                                               9870      2026-04-22
+\capsules\TOC-01837.oif                                                               9898      2026-04-29
+\capsules\TOC-01838.oif                                                               9919      2026-04-29
+\capsules\TOC-01839.oif                                                               9926      2026-04-30
+\capsules\TOC-01840.oif                                                               9945      2026-05-06
+\capsules\TOC-01846.oif                                                               9941      2026-05-07
+\capsules\TOC-01847.oif                                                               9944      2026-05-12
+\capsules\TOC-01848.oif                                                               9944      2026-05-13
+\capsules\TOC-01850.oif                                                               9945      2026-05-14
+\capsules\TOC-01851.oif                                                               9948      2026-05-20
+\capsules\TOC-01855.oif                                                               10002     2026-05-30
+\capsules\TOC-01857.oif                                                               10008     2026-06-06
+\capsules\TOC-01858.oif                                                               10008     2026-06-10
+\capsules\TOC-01859.oif                                                               10028     2026-06-15
+\capsules\TOC-01860.oif                                                               10029     2026-06-18
+\capsules\TOC-01861.oif                                                               10030     2026-06-24
+\capsules\TOC-01863.oif                                                               10031     2026-06-25
+\capsules\TOC-01864.oif                                                               10033     2026-06-27
+\capsules\TOC-01866.oif                                                               10046     2026-07-11
+\capsules\TOC-01867.oif                                                               10047     2026-07-21
+\capsules\TOC-01868.oif                                                               10050     2026-07-23
+\capsules\TOC-01869.oif                                                               10062     2026-08-06
+\capsules\TOC-01870.oif                                                               10070     2026-08-10
+\capsules\TOC-01878.oif                                                               10092     2026-09-02
+\capsules\TOC-01879.oif                                                               10097     2026-09-10
+\capsules\TOC-01880.oif                                                               10109     2026-09-24
+\capsules\TOC-01881.oif                                                               10109     2026-09-25
+\capsules\TOC-01882.oif                                                               10114     2026-09-29
+\capsules\TOC-01883.oif                                                               10114     2026-10-01
+\capsules\TOC-01884.oif                                                               10119     2026-10-06
+\capsules\TOC-01885.oif                                                               10120     2026-10-08
+\capsules\TOC-01886.oif                                                               10128     2026-10-09
+\capsules\TOC-01887.oif                                                               10128     2026-10-13
+\capsules\TOC-01888.oif                                                               10134     2026-10-23
+\capsules\TP-1-1-1-0-0-15403.cif                                                      161       2025-08-28
+\capsules\TP-1-1-1-0-0-15403.dif                                                      137       2025-08-28
+\capsules\TP-1-1-1-1-0-15748.cif                                                      161       2025-08-28
+\capsules\TP-1-1-1-1-0-15748.dif                                                      137       2025-08-28
+\capsules\TP-1-1-1-1-1-15881.cif                                                      163       2025-08-28
+\capsules\TP-1-1-1-1-1-15881.dif                                                      137       2025-08-28
+\capsules\TP-1-1-1-1-2-15988.cif                                                      166       2025-08-28
+\capsules\TP-1-1-1-1-2-15988.dif                                                      141       2025-08-28
+\capsules\TP-1-1-1-1-3-16125.cif                                                      166       2025-08-28
+\capsules\TP-1-1-1-1-3-16125.dif                                                      141       2025-08-28
+\capsules\TP-1-1-1-1-4-16463.cif                                                      166       2025-08-28
+\capsules\TP-1-1-1-1-4-16463.dif                                                      140       2025-08-28
+\capsules\TP-1-1-2-0-0-17212.cif                                                      163       2025-08-28
+\capsules\TP-1-1-2-0-0-17212.dif                                                      140       2025-08-28
+\capsules\TP-1-1-2-0-1-18550.cif                                                      165       2025-08-28
+\capsules\TP-1-1-2-0-1-18550.dif                                                      140       2025-08-28
+\capsules\TP-1-1-2-1-0-19187.cif                                                      213       2025-08-28
+\capsules\TP-1-1-2-1-0-19187.dif                                                      140       2025-08-28
+\capsules\TP-1-1-3-0-0-22747.cif                                                      213       2025-08-28
+\capsules\TP-1-1-3-0-0-22747.dif                                                      140       2025-08-28
+\capsules\TP-1-1-3-0-1-22934.cif                                                      214       2025-08-28
+\capsules\TP-1-1-3-0-1-22934.dif                                                      140       2025-08-28
+\capsules\TP-1-1-4-0-0-23536.cif                                                      213       2025-08-28
+\capsules\TP-1-1-4-0-0-23536.dif                                                      140       2025-08-28
+\capsules\TP-1-1-4-1-0-23986.cif                                                      213       2025-08-28
+\capsules\TP-1-1-4-1-0-23986.dif                                                      140       2025-08-28
+\capsules\TP-1-1-5-0-0-25033.cif                                                      211       2025-08-28
+\capsules\TP-1-1-5-0-0-25033.dif                                                      140       2025-08-28
+\capsules\TP-1-1-5-1-0-25623.cif                                                      210       2025-08-28
+\capsules\TP-1-1-5-1-0-25623.dif                                                      140       2025-08-28
+\capsules\TP-1-1-6-0-0-26243.cif                                                      213       2025-08-28
+\capsules\TP-1-1-6-0-0-26243.dif                                                      140       2025-08-28
+\capsules\TP-1-1-6-1-0-26873.cif                                                      213       2025-07-03
+\capsules\TP-1-1-6-1-0-26873.dif                                                      140       2025-07-03
+\capsules\TP-1-1-6-2-0-27317.cif                                                      216       2025-08-28
+\capsules\TP-1-1-6-2-0-27317.dif                                                      143       2025-08-28
+\capsules\TP-1-1-7-0-0-27958.cif                                                      212       2025-12-20
+\capsules\TP-1-1-7-0-0-27958.dif                                                      139       2025-12-20
+\capsules\TP-1-1-7-0-0-27974.cif                                                      212       2026-06-27
+\capsules\TP-1-1-7-0-0-27974.dif                                                      139       2026-06-27
+\capsules\TP-1-1-7-1-0-29327.cif                                                      212       2026-06-27
+\capsules\TP-1-1-7-1-0-29327.dif                                                      139       2026-06-27
+\capsules\TP-1-1-7-2-0-29802.cif                                                      215       2026-10-12
+\capsules\TP-1-1-7-2-0-29802.dif                                                      142       2026-10-12
+\capsules\updates.guf                                                                 5176      2026-10-26
+\capsules\updates.tuf                                                                 1080      2026-10-23
+\config\reportviews                                                                             2025-05-10
+\config\reportviews\GSTR HSNSACSummaryStaticsGSTR-1  -  HSN0SAC Summary - My View.tsf 50189     2021-09-04
+\lang\0000arabic.dct                                                                  16855     2025-08-23
+
+
+
