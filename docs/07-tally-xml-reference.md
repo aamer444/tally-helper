@@ -175,7 +175,10 @@ Tally does **not** say *which* voucher failed, so `tally-client` uses this strat
 - Send `REMOTEID="th-<sha1(companyId|batchId|row)>"` on each voucher. Re-importing the same REMOTEID should **alter** rather than duplicate. **Confirm this on 7.1 with a test company.**
 - Undo is the same envelope with `ACTION="Delete"` on the voucher, identified by its REMOTEID/GUID, or `DATE` + `VOUCHERTYPENAME` + `VOUCHERNUMBER`.
 
-## 7.12 Gotchas
+## 7.12 Samples & dummy Tally
+A request/response pair for every operation above, plus a dummy Tally server that validates imports, lives in [tools/tally-mock](../tools/tally-mock/README.md). The response parser must accept both the `<ENVELOPE>…<IMPORTRESULT>` shape and the older bare `<RESPONSE>` shape.
+
+## 7.13 Gotchas
 - The company **must be open** in Tally, or you get "Could not set SVCurrentCompany".
 - Dates outside the company's FY or before "Books From" are rejected.
 - Ledger names must match **exactly**, including trailing spaces and the "M/s." prefix. That is why we match against the cached list.

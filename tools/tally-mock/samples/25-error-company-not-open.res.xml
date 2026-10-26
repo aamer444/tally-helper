@@ -1,0 +1,4 @@
+<ENVELOPE>
+ <HEADER><VERSION>1</VERSION><STATUS>0</STATUS></HEADER>
+ <BODY><DATA><LINEERROR>Could not set 'SVCurrentCompany' to 'Some Other Company - 2025-26'.</LINEERROR></DATA></BODY>
+</ENVELOPE>

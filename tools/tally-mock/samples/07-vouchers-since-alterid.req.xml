@@ -1,0 +1,18 @@
+<ENVELOPE>
+ <HEADER><VERSION>1</VERSION><TALLYREQUEST>Export</TALLYREQUEST><TYPE>Collection</TYPE><ID>VchSync</ID></HEADER>
+ <BODY><DESC>
+  <STATICVARIABLES>
+   <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+   <SVCURRENTCOMPANY>Demo Traders - 2025-26</SVCURRENTCOMPANY>
+   <SVFROMDATE TYPE="Date">20250401</SVFROMDATE><SVTODATE TYPE="Date">20260331</SVTODATE>
+  </STATICVARIABLES>
+  <TDL><TDLMESSAGE>
+   <COLLECTION NAME="VchSync" ISMODIFY="No">
+    <TYPE>Voucher</TYPE>
+    <FETCH>GUID, MasterID, AlterID, Date, VoucherTypeName, VoucherNumber, Reference, PartyLedgerName, Narration, IsCancelled, AllLedgerEntries.LedgerName, AllLedgerEntries.Amount</FETCH>
+    <FILTER>AfterAlter</FILTER>
+   </COLLECTION>
+   <SYSTEM TYPE="Formulae" NAME="AfterAlter">$AlterID &gt; 5000</SYSTEM>
+  </TDLMESSAGE></TDL>
+ </DESC></BODY>
+</ENVELOPE>

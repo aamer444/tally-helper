@@ -20,3 +20,4 @@ target/
 research/_private/
 !research/**/*.xml
 !research/**/*.csv
+!tools/tally-mock/samples/**
