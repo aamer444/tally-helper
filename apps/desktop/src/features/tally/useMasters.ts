@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { errorMessage } from "../../lib/errors";
-import { fetchLedgers, fetchSalesVoucherTypes } from "./masters";
-import type { Company, Ledger } from "./types";
+import { fetchLedgers, fetchStockItems, fetchUnits, fetchVoucherTypes } from "./masters";
+import type { Company, Ledger, StockItem } from "./types";
 
 export interface Masters {
   /** "ready" stays while a refresh runs, so screens built on the ledgers do not flicker away. */
@@ -9,6 +9,8 @@ export interface Masters {
   refreshing: boolean;
   ledgers: Ledger[];
   voucherTypes: string[];
+  stockItems: StockItem[];
+  units: string[];
   error: string | null;
   reload: () => Promise<void>;
 }
@@ -17,12 +19,14 @@ interface Loaded {
   company: string;
   ledgers: Ledger[];
   voucherTypes: string[];
+  stockItems: StockItem[];
+  units: string[];
 }
 
 const NONE: never[] = [];
 
-/** Ledgers and sales voucher types of the selected company, read fresh from Tally. */
-export function useMasters(url: string, company: Company | null): Masters {
+/** Ledgers, stock items, units and the voucher types under `voucherParent` (e.g. "Sales"), read fresh from Tally. */
+export function useMasters(url: string, company: Company | null, voucherParent: string): Masters {
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [failure, setFailure] = useState<{ company: string; message: string } | null>(null);
@@ -34,16 +38,21 @@ export function useMasters(url: string, company: Company | null): Masters {
     if (!companyName) return;
     setRefreshing(true);
     try {
-      const [ledgers, voucherTypes] = await Promise.all([fetchLedgers(url, companyName), fetchSalesVoucherTypes(url, companyName)]);
+      const [ledgers, voucherTypes, stockItems, units] = await Promise.all([
+        fetchLedgers(url, companyName),
+        fetchVoucherTypes(url, companyName, voucherParent),
+        fetchStockItems(url, companyName),
+        fetchUnits(url, companyName),
+      ]);
       if (request !== latestRequest.current) return;
-      setLoaded({ company: companyName, ledgers: ledgers.sort((a, b) => a.name.localeCompare(b.name)), voucherTypes });
+      setLoaded({ company: companyName, ledgers: ledgers.sort((a, b) => a.name.localeCompare(b.name)), voucherTypes, stockItems, units });
       setFailure(null);
     } catch (e) {
       if (request === latestRequest.current) setFailure({ company: companyName, message: errorMessage(e) });
     } finally {
       if (request === latestRequest.current) setRefreshing(false);
     }
-  }, [url, companyName]);
+  }, [url, companyName, voucherParent]);
 
   useEffect(() => {
     void reload();
@@ -61,6 +70,8 @@ export function useMasters(url: string, company: Company | null): Masters {
     refreshing,
     ledgers: current?.ledgers ?? NONE,
     voucherTypes: current?.voucherTypes ?? NONE,
+    stockItems: current?.stockItems ?? NONE,
+    units: current?.units ?? NONE,
     error,
     reload,
   };

@@ -1,44 +1,42 @@
-import { ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
 import { parseDateCell } from "../../../lib/dates";
 import { formatTallyDate } from "../../../lib/format";
 import type { Masters } from "../../tally/useMasters";
-import type { SalesSettings } from "../import/build-vouchers";
-import { cellText, FIELDS, missingRequired, type FieldId } from "../import/fields";
+import type { InvoiceSettings } from "../import/build-vouchers";
+import { cellText, fieldsFor, missingRequired, type FieldDef, type FieldId } from "../import/fields";
 import { columnLetter, headersOf, openSheet, sheetOf, withHeaderRow, type ImportFile } from "../import/import-file";
+import type { KindConfig } from "../import/kind";
+import { ledgerBlockers, LedgersCard } from "./LedgersCard";
 import { StepFooter } from "./StepFooter";
+import { CARD, SELECT } from "./styles";
 
 const PREVIEW_ROWS = 5;
-const CARD = "rounded-lg border border-slate-200 bg-white p-5";
-const SELECT = "w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-blue-500";
 
 interface MapStepProps {
+  kind: KindConfig;
   file: ImportFile;
   onFileChange: (file: ImportFile) => void;
-  settings: SalesSettings;
-  onSettingsChange: (patch: Partial<SalesSettings>) => void;
+  settings: InvoiceSettings;
+  onSettingsChange: (patch: Partial<InvoiceSettings>) => void;
   masters: Masters;
   onBack: () => void;
   onNext: () => void;
 }
 
-export function MapStep({ file, onFileChange, settings, onSettingsChange, masters, onBack, onNext }: MapStepProps) {
-  const missing = missingRequired(file.mapping);
-  const blockers = [
-    ...missing.map((m) => `Choose the column for ${m}`),
-    ...(masters.status !== "ready" ? ["Ledgers have not been read from Tally yet"] : []),
-    ...(masters.status === "ready" && !settings.salesLedger ? ["Choose the Sales ledger"] : []),
-  ];
+export function MapStep({ kind, file, onFileChange, settings, onSettingsChange, masters, onBack, onNext }: MapStepProps) {
+  const fields = fieldsFor(kind);
+  const blockers = [...missingRequired(file.mapping).map((m) => `Choose the column for ${m}`), ...ledgerBlockers(kind, settings, masters)];
 
   return (
     <>
-      <div className="flex-1 space-y-6 px-6 pb-6">
+      <div className="flex-1 space-y-4 px-6 pb-4">
         <FileCard file={file} onFileChange={onFileChange} />
         <div className="grid gap-6 xl:grid-cols-2">
-          <ColumnsCard file={file} onFileChange={onFileChange} />
-          <LedgersCard settings={settings} onSettingsChange={onSettingsChange} masters={masters} />
+          <ColumnsCard fields={fields} file={file} onFileChange={onFileChange} />
+          <LedgersCard kind={kind} settings={settings} onSettingsChange={onSettingsChange} masters={masters} />
         </div>
-        <PreviewCard file={file} />
+        <PreviewCard fields={fields} file={file} />
       </div>
       <StepFooter info={blockers[0] && <span className="text-amber-700">{blockers[0]}</span>}>
         <Button onClick={onBack}>
@@ -100,7 +98,12 @@ function sampleValue(file: ImportFile, col: number): string {
   return cellText(rows.find((r) => cellText(r[col]))?.[col]);
 }
 
-function ColumnsCard({ file, onFileChange }: { file: ImportFile; onFileChange: (f: ImportFile) => void }) {
+interface CardProps {
+  fields: FieldDef[];
+  file: ImportFile;
+}
+
+function ColumnsCard({ fields, file, onFileChange }: CardProps & { onFileChange: (f: ImportFile) => void }) {
   const headers = headersOf(file);
   const setColumn = (field: FieldId, value: string) => {
     const mapping = { ...file.mapping };
@@ -114,7 +117,7 @@ function ColumnsCard({ file, onFileChange }: { file: ImportFile; onFileChange: (
       <h2 className="font-semibold">Match your columns</h2>
       <p className="mt-1 text-sm text-slate-600">We guessed from the headings. Check each one; * is required.</p>
       <div className="mt-4 grid grid-cols-[150px_1fr_120px] items-center gap-x-3 gap-y-2 text-sm">
-        {FIELDS.map((f) => {
+        {fields.map((f) => {
           const col = file.mapping[f.id];
           return (
             <div key={f.id} className="contents">
@@ -141,60 +144,6 @@ function ColumnsCard({ file, onFileChange }: { file: ImportFile; onFileChange: (
   );
 }
 
-const LEDGER_FIELDS: { key: keyof SalesSettings; label: string; hint: string }[] = [
-  { key: "salesLedger", label: "Sales ledger *", hint: "Taxable value is credited here" },
-  { key: "cgstLedger", label: "CGST ledger", hint: "Same-state sales" },
-  { key: "sgstLedger", label: "SGST ledger", hint: "Same-state sales" },
-  { key: "igstLedger", label: "IGST ledger", hint: "Other-state sales" },
-  { key: "roundOffLedger", label: "Round off ledger", hint: "Up to ₹1 difference" },
-];
-
-function LedgersCard({ settings, onSettingsChange, masters }: Pick<MapStepProps, "settings" | "onSettingsChange" | "masters">) {
-  return (
-    <section className={CARD}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="font-semibold">Tally ledgers</h2>
-          <p className="mt-1 text-sm text-slate-600">Where each amount goes in Tally.</p>
-        </div>
-        <Button className="px-3 py-1.5" disabled={masters.refreshing} onClick={() => void masters.reload()}>
-          <RefreshCw size={14} className={masters.refreshing ? "animate-spin" : ""} /> Refresh from Tally
-        </Button>
-      </div>
-
-      {masters.status === "idle" && <p className="mt-4 text-sm text-amber-700">Open a company in Tally and select it at the top.</p>}
-      {masters.status === "loading" && <p className="mt-4 text-sm text-slate-600">Reading ledgers from Tally…</p>}
-      {masters.status === "error" && <p className="mt-4 text-sm text-red-700">{masters.error}</p>}
-
-      {masters.status === "ready" && (
-        <div className="mt-4 grid grid-cols-[150px_1fr] items-center gap-x-3 gap-y-2 text-sm">
-          <span>Voucher type *</span>
-          <select className={SELECT} value={settings.voucherType} onChange={(e) => onSettingsChange({ voucherType: e.target.value })}>
-            {(masters.voucherTypes.length ? masters.voucherTypes : ["Sales"]).map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
-          {LEDGER_FIELDS.map(({ key, label, hint }) => (
-            <div key={key} className="contents">
-              <span title={hint}>{label}</span>
-              <select className={SELECT} value={settings[key]} onChange={(e) => onSettingsChange({ [key]: e.target.value })}>
-                <option value="">— None —</option>
-                {masters.ledgers.map((l) => (
-                  <option key={l.name} value={l.name}>
-                    {l.name}
-                    {l.parent ? `  (${l.parent})` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
-          <p className="col-span-2 mt-1 text-xs text-slate-500">{masters.ledgers.length} ledgers read from Tally.</p>
-        </div>
-      )}
-    </section>
-  );
-}
-
 /** Dates are shown as we understood them, so a day/month mix-up is caught here. */
 function previewCell(field: FieldId, value: unknown) {
   if (field !== "date" || cellText(value) === "") return cellText(value);
@@ -202,8 +151,8 @@ function previewCell(field: FieldId, value: unknown) {
   return date ? formatTallyDate(date) : <span className="text-red-700">{cellText(value)} (not a date)</span>;
 }
 
-function PreviewCard({ file }: { file: ImportFile }) {
-  const mapped = FIELDS.filter((f) => file.mapping[f.id] !== undefined);
+function PreviewCard({ fields, file }: CardProps) {
+  const mapped = fields.filter((f) => file.mapping[f.id] !== undefined);
   const rows = sheetOf(file).rows.slice(file.headerRow + 1, file.headerRow + 1 + PREVIEW_ROWS);
   return (
     <section className={CARD}>

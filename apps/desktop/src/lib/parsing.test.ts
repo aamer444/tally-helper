@@ -52,4 +52,8 @@ describe("escapeXml", () => {
   test("escapes characters that would break or inject into a Tally request", () => {
     expect(escapeXml(`Patel & Sons <"Main">'s`)).toBe("Patel &amp; Sons &lt;&quot;Main&quot;&gt;&apos;s");
   });
+
+  test("drops control characters XML does not allow, keeping tabs and line breaks", () => {
+    expect(escapeXml("INV\u0000-1\u001F2\tA\nB")).toBe("INV-12\tA\nB");
+  });
 });

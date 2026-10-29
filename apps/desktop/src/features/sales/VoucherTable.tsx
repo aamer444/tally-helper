@@ -1,25 +1,27 @@
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { formatPaise, formatTallyDate } from "../../lib/format";
-import type { SalesVoucher } from "./import/build-vouchers";
+import type { InvoiceVoucher } from "./import/build-vouchers";
+import type { KindConfig } from "./import/kind";
 
 interface VoucherTableProps {
-  vouchers: SalesVoucher[];
+  kind: KindConfig;
+  vouchers: InvoiceVoucher[];
   selectedId: string | null;
-  isChecked: (v: SalesVoucher) => boolean;
+  isChecked: (v: InvoiceVoucher) => boolean;
   onSelect: (id: string) => void;
-  onToggle: (v: SalesVoucher) => void;
+  onToggle: (v: InvoiceVoucher) => void;
   allChecked: boolean;
   onToggleAll: () => void;
 }
 
 const TH = "px-3 py-2.5 text-left font-medium whitespace-nowrap";
 
-function issueSummary(v: SalesVoucher): string {
+function issueSummary(v: InvoiceVoucher): string {
   if (!v.issues.length) return "–";
   return v.issues.length > 1 ? `${v.issues[0].message} (+${v.issues.length - 1} more)` : v.issues[0].message;
 }
 
-export function VoucherTable({ vouchers, selectedId, isChecked, onSelect, onToggle, allChecked, onToggleAll }: VoucherTableProps) {
+export function VoucherTable({ kind, vouchers, selectedId, isChecked, onSelect, onToggle, allChecked, onToggleAll }: VoucherTableProps) {
   return (
     <table className="w-full text-sm">
       <thead className="bg-slate-50 text-slate-700">
@@ -29,8 +31,8 @@ export function VoucherTable({ vouchers, selectedId, isChecked, onSelect, onTogg
           </th>
           <th className={TH}>Row</th>
           <th className={TH}>Date</th>
-          <th className={TH}>Invoice No</th>
-          <th className={TH}>Party / Customer</th>
+          <th className={TH}>{kind.invoiceNoLabel}</th>
+          <th className={TH}>{kind.partyLabel}</th>
           <th className={`${TH} text-right`}>Total (₹)</th>
           <th className={TH}>Status</th>
           <th className={TH}>Issues</th>

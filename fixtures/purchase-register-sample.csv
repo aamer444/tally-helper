@@ -1,0 +1,7 @@
+Demo Traders - Purchase Register April 2025 (made-up data for testing)
+,,,,,,,,,
+Bill Date,Supplier Invoice No,Supplier Name,Supplier GSTIN,Taxable Value,CGST,SGST,IGST,Bill Total,Remarks
+08/04/2025,OD/2025/91,Om Distributors,,"20,000.00","1,800.00","1,800.00",,"23,600.00",
+10/04/2025,DF-778,Delhi Footwear Co,07AAACD1234E1ZB,"2,029,989.17",,,101499.46,"2,131,488.61",Inter-state: IGST; supplier's rounding leaves 2 paise
+12/04/2025,101,Om Distributors,,1000,90,90,,1180,Same bill no as the next row but another supplier
+12/04/2025,101,Laxmi Footwear Agencies,,500,45,45,,590,Supplier not in Tally: error

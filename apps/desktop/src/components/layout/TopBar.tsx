@@ -47,7 +47,10 @@ function CompanyPicker({ company }: { company: CompanyState }) {
   const { companies, selected } = company;
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <label className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium">
+      <label
+        title={selected ? `The Tally company vouchers go into${selected.booksFrom ? ` (books from ${formatTallyDate(selected.booksFrom)})` : ""}` : undefined}
+        className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium"
+      >
         <Building2 size={16} className="shrink-0 text-blue-700" />
         {companies.length ? (
           <select
@@ -67,9 +70,6 @@ function CompanyPicker({ company }: { company: CompanyState }) {
           <span className="text-slate-500">No company open in Tally</span>
         )}
       </label>
-      {selected?.booksFrom && (
-        <span className="text-sm text-slate-600">Books from {formatTallyDate(selected.booksFrom)}</span>
-      )}
     </div>
   );
 }

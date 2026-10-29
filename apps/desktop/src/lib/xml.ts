@@ -1,8 +1,12 @@
 const ESCAPES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" };
 
+// Characters XML 1.0 does not allow at all; PDFs with broken font maps can produce them.
+// eslint-disable-next-line no-control-regex
+const ILLEGAL_XML_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g;
+
 /** Every value from a user's file goes through this before it is put into a Tally request. */
 export function escapeXml(text: string): string {
-  return text.replace(/[&<>"']/g, (c) => ESCAPES[c]);
+  return text.replace(ILLEGAL_XML_CHARS, "").replace(/[&<>"']/g, (c) => ESCAPES[c]);
 }
 
 // Tally sometimes emits control-character references (e.g. &#4;) that strict XML parsers reject.

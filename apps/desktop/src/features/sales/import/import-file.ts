@@ -1,3 +1,4 @@
+import type { BillItems } from "../pdf/parse-items";
 import { autoMap, cellText, findHeaderRow, type Mapping } from "./fields";
 import type { Sheet, Workbook } from "./read-sheet";
 
@@ -7,6 +8,8 @@ export interface ImportFile {
   sheetIndex: number;
   headerRow: number; // 0-based
   mapping: Mapping;
+  /** Product lines of PDF bills, by the row number (from 1) the bill sits on. */
+  items?: ReadonlyMap<number, BillItems>;
 }
 
 export const sheetOf = (f: ImportFile): Sheet => f.workbook.sheets[f.sheetIndex];

@@ -5,24 +5,27 @@ import { StatCard } from "../../../components/ui/StatCard";
 import type { ReviewStatus } from "../../../components/ui/StatusBadge";
 import { formatPaise } from "../../../lib/format";
 import type { Masters } from "../../tally/useMasters";
-import type { SalesVoucher } from "../import/build-vouchers";
+import type { InvoiceVoucher } from "../import/build-vouchers";
 import { headersOf, sheetOf, type ImportFile } from "../import/import-file";
-import { VoucherPanel } from "../VoucherPanel";
+import type { KindConfig } from "../import/kind";
+import { VoucherPanel, type MasterActions } from "../VoucherPanel";
 import { VoucherTable } from "../VoucherTable";
 import { StepFooter } from "./StepFooter";
 
 type Filter = "all" | ReviewStatus;
 
 interface ReviewStepProps {
-  vouchers: SalesVoucher[];
+  kind: KindConfig;
+  vouchers: InvoiceVoucher[];
   file: ImportFile;
   voucherType: string;
   masters: Masters;
   onBack: () => void;
-  onPush: (selected: SalesVoucher[]) => void;
+  onPush: (selected: InvoiceVoucher[]) => void;
+  actions: MasterActions | null;
 }
 
-function summarise(vouchers: SalesVoucher[]) {
+function summarise(vouchers: InvoiceVoucher[]) {
   const count = (s: ReviewStatus) => vouchers.filter((v) => v.status === s).length;
   return {
     rows: vouchers.reduce((n, v) => n + v.rowNumbers.length, 0),
@@ -33,13 +36,13 @@ function summarise(vouchers: SalesVoucher[]) {
   };
 }
 
-function matches(v: SalesVoucher, filter: Filter, query: string): boolean {
+function matches(v: InvoiceVoucher, filter: Filter, query: string): boolean {
   if (filter !== "all" && v.status !== filter) return false;
   const q = query.trim().toLowerCase();
   return !q || [v.invoiceNo, v.party, v.gstin, ...v.lines.map((l) => l.ledger)].some((s) => s.toLowerCase().includes(q));
 }
 
-export function ReviewStep({ vouchers, file, voucherType, masters, onBack, onPush }: ReviewStepProps) {
+export function ReviewStep({ kind, vouchers, file, voucherType, masters, onBack, onPush, actions }: ReviewStepProps) {
   const stats = useMemo(() => summarise(vouchers), [vouchers]);
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
@@ -48,13 +51,13 @@ export function ReviewStep({ vouchers, file, voucherType, masters, onBack, onPus
   const [excluded, setExcluded] = useState<ReadonlySet<string>>(new Set());
 
   const shown = vouchers.filter((v) => matches(v, filter, query));
-  const isChecked = (v: SalesVoucher) => v.status !== "error" && !excluded.has(v.id);
+  const isChecked = (v: InvoiceVoucher) => v.status !== "error" && !excluded.has(v.id);
   const toPush = vouchers.filter(isChecked);
   const pushTotal = toPush.reduce((n, v) => n + v.total, 0);
   const selected = vouchers.find((v) => v.id === selectedId);
   const allShownChecked = shown.some(isChecked) && shown.every((v) => v.status === "error" || isChecked(v));
 
-  const toggle = (v: SalesVoucher) =>
+  const toggle = (v: InvoiceVoucher) =>
     setExcluded((prev) => {
       const next = new Set(prev);
       if (next.has(v.id)) next.delete(v.id);
@@ -80,10 +83,10 @@ export function ReviewStep({ vouchers, file, voucherType, masters, onBack, onPus
 
   return (
     <>
-      <div className="flex-1 space-y-6 px-6 pb-6">
+      <div className="flex-1 space-y-4 px-6 pb-4">
         <div className="grid grid-cols-5 gap-4">
           <StatCard icon={FileSpreadsheet} tone="blue" label="Rows Read" value={stats.rows} hint={`from ${file.workbook.fileName}`} />
-          <StatCard icon={ReceiptText} tone="blue" label="Vouchers" value={stats.vouchers} hint={`${stats.rows} rows joined by Invoice No`} />
+          <StatCard icon={ReceiptText} tone="blue" label="Vouchers" value={stats.vouchers} hint={`${stats.rows} rows joined by ${kind.invoiceNoLabel}`} />
           <StatCard icon={CircleCheck} tone="green" label="Ready to Push" value={stats.ready} hint="No issues" />
           <StatCard icon={TriangleAlert} tone="amber" label="Warnings" value={stats.warnings} hint="Check, can still push" />
           <StatCard icon={CircleX} tone="red" label="Errors" value={stats.errors} hint={stats.errors ? "Fix in file or Tally" : "None"} />
@@ -119,6 +122,7 @@ export function ReviewStep({ vouchers, file, voucherType, masters, onBack, onPus
             </div>
             <div className="overflow-x-auto">
               <VoucherTable
+                kind={kind}
                 vouchers={shown}
                 selectedId={selectedId}
                 isChecked={isChecked}
@@ -137,6 +141,7 @@ export function ReviewStep({ vouchers, file, voucherType, masters, onBack, onPus
               headers={headersOf(file)}
               sheetRows={sheetOf(file).rows}
               voucherType={voucherType}
+              actions={actions}
               onClose={() => setSelectedId(null)}
             />
           )}

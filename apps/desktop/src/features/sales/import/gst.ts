@@ -19,6 +19,9 @@ const CODE_BY_NAME = new Map<string, string>([
   ["orissa", "21"], ["pondicherry", "34"], ["newdelhi", "07"],
 ]);
 
+/** "27" gives "Maharashtra"; unknown codes give "". */
+export const stateNameOf = (code: string): string => STATES[code] ?? "";
+
 /** "Maharashtra", "27", "27-Maharashtra" and "Maharashtra (27)" all give "27". */
 export function stateCodeOf(text: string): string | null {
   const t = text.trim();

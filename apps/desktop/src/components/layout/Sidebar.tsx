@@ -1,5 +1,4 @@
 import { NAV_SECTIONS, type PageId } from "../../app/navigation";
-import { formatTallyDate } from "../../lib/format";
 import { RetryButton } from "../../features/connection/RetryButton";
 import type { Company } from "../../features/tally/types";
 import {
@@ -75,9 +74,6 @@ function ConnectionCard({ tally, company }: { tally: TallyConnection; company: C
       <p className="mt-1 truncate pl-4.5 text-xs text-slate-500" title={company?.name}>
         {company?.name ?? "No company selected"}
       </p>
-      {company?.booksFrom && (
-        <p className="pl-4.5 text-xs text-slate-500">Books from {formatTallyDate(company.booksFrom)}</p>
-      )}
       {isDisconnected(tally.status) && <RetryButton tally={tally} className="mt-2 w-full justify-center" />}
     </div>
   );

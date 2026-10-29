@@ -5,6 +5,11 @@ export interface Company {
   booksFrom: string; // YYYYMMDD
 }
 
+export interface StockItem {
+  name: string;
+  baseUnits: string;
+}
+
 export interface Ledger {
   name: string;
   parent: string;

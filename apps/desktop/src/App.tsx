@@ -5,10 +5,13 @@ import { TopBar } from "./components/layout/TopBar";
 import { useTallyStatus, type TallyConnection } from "./features/connection/useTallyStatus";
 import { HomePage } from "./features/home/HomePage";
 import { ComingSoon } from "./features/placeholder/ComingSoon";
-import { SalesImportPage } from "./features/sales/SalesImportPage";
+import { InvoiceImportPage } from "./features/sales/InvoiceImportPage";
 import { TallyDataPage } from "./features/tally-data/TallyDataPage";
 import { useCompanies } from "./features/tally/useCompanies";
 import type { Company } from "./features/tally/types";
+
+const IMPORT_PAGES = ["sales", "purchase"] as const;
+const isImportPage = (page: PageId): page is (typeof IMPORT_PAGES)[number] => (IMPORT_PAGES as readonly PageId[]).includes(page);
 
 function renderPage(page: PageId, tally: TallyConnection, company: Company | null) {
   if (page === "home") return <HomePage tally={tally} />;
@@ -28,10 +31,12 @@ export default function App() {
         <TopBar tally={tally} company={company} />
         <main className="min-h-0 flex-1 overflow-auto bg-slate-50">
           {/* Kept mounted so an import in progress survives a visit to another page. */}
-          <div hidden={page !== "sales"} className="h-full">
-            <SalesImportPage tally={tally} company={company.selected} />
-          </div>
-          {page !== "sales" && renderPage(page, tally, company.selected)}
+          {IMPORT_PAGES.map((kind) => (
+            <div key={kind} hidden={page !== kind} className="h-full">
+              <InvoiceImportPage kind={kind} tally={tally} company={company.selected} />
+            </div>
+          ))}
+          {!isImportPage(page) && renderPage(page, tally, company.selected)}
         </main>
       </div>
     </div>

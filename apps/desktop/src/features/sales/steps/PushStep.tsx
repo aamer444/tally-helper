@@ -3,14 +3,16 @@ import { ArrowLeft, CircleStop, Play, RotateCcw, ShieldAlert, Upload } from "luc
 import { Button } from "../../../components/ui/Button";
 import { formatPaise, formatTallyDate } from "../../../lib/format";
 import type { Company } from "../../tally/types";
-import type { SalesVoucher } from "../import/build-vouchers";
+import type { InvoiceVoucher } from "../import/build-vouchers";
+import type { KindConfig } from "../import/kind";
 import { pushVoucher, type PushResult } from "../import/push";
 import { StepFooter } from "./StepFooter";
 
 type Phase = "confirm" | "running" | "finished";
 
 interface PushStepProps {
-  vouchers: SalesVoucher[];
+  kind: KindConfig;
+  vouchers: InvoiceVoucher[];
   company: Company;
   url: string;
   voucherType: string;
@@ -25,7 +27,7 @@ const RESULT_LABEL: Record<PushResult["state"], { text: string; className: strin
   unknown: { text: "Not sure", className: "text-amber-700" },
 };
 
-export function PushStep({ vouchers, company, url, voucherType, onBack, onNewImport }: PushStepProps) {
+export function PushStep({ kind, vouchers, company, url, voucherType, onBack, onNewImport }: PushStepProps) {
   const [phase, setPhase] = useState<Phase>("confirm");
   const [results, setResults] = useState<ReadonlyMap<string, PushResult>>(new Map());
   const stopRequested = useRef(false);
@@ -35,7 +37,7 @@ export function PushStep({ vouchers, company, url, voucherType, onBack, onNewImp
   const failed = vouchers.filter((v) => results.get(v.id)?.state === "failed");
   const total = vouchers.reduce((n, v) => n + v.total, 0);
 
-  async function run(list: SalesVoucher[]) {
+  async function run(list: InvoiceVoucher[]) {
     stopRequested.current = false;
     setPhase("running");
     for (const v of list) {
@@ -48,14 +50,14 @@ export function PushStep({ vouchers, company, url, voucherType, onBack, onNewImp
 
   return (
     <>
-      <div className="flex-1 space-y-6 px-6 pb-6">
+      <div className="flex-1 space-y-4 px-6 pb-4">
         {phase === "confirm" ? (
           <section className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
             <h2 className="flex items-center gap-2 text-lg font-semibold">
               <ShieldAlert size={20} /> Check before pushing
             </h2>
             <p className="mt-2">
-              This will create <b>{vouchers.length}</b> sales vouchers worth <b>₹{formatPaise(total)}</b> in the Tally company{" "}
+              This will create <b>{vouchers.length}</b> {kind.mainRole.toLowerCase()} vouchers worth <b>₹{formatPaise(total)}</b> in the Tally company{" "}
               <b>{company.name}</b>, using voucher type <b>{voucherType}</b>.
             </p>
             <p className="mt-2">
@@ -132,7 +134,7 @@ function Progress(p: { done: number; total: number; created: number; altered: nu
   );
 }
 
-function ResultsTable({ vouchers, results }: { vouchers: SalesVoucher[]; results: ReadonlyMap<string, PushResult> }) {
+function ResultsTable({ vouchers, results }: { vouchers: InvoiceVoucher[]; results: ReadonlyMap<string, PushResult> }) {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
       <table className="w-full text-sm">

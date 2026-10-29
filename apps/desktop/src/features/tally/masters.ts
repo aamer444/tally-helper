@@ -1,6 +1,6 @@
 import { childText, escapeXml } from "../../lib/xml";
 import { postToTally } from "./tally-client";
-import type { Company, Ledger } from "./types";
+import type { Company, Ledger, StockItem } from "./types";
 
 // Read-only Export requests (docs/07). Nothing here changes the user's books.
 const COMPANIES_REQUEST = `<ENVELOPE>
@@ -68,12 +68,27 @@ export async function fetchLedgers(url: string, company: string): Promise<Ledger
     .filter((l) => l.name);
 }
 
-/** Voucher types whose parent is Sales, e.g. "Sales" and a custom "Cash Sale". */
-export async function fetchSalesVoucherTypes(url: string, company: string): Promise<string[]> {
+export async function fetchStockItems(url: string, company: string): Promise<StockItem[]> {
+  const doc = await postToTally(url, collectionRequest(company, "THStockItems", "StockItem", "Name, BaseUnits"), 60_000);
+  rejectLineError(doc);
+  return [...doc.getElementsByTagName("STOCKITEM")]
+    .map((el) => ({ name: nameOf(el), baseUnits: childText(el, "BASEUNITS") }))
+    .filter((s) => s.name);
+}
+
+/** Unit symbols, e.g. "Nos" and "PAIR"; a stock item can only use a unit that exists. */
+export async function fetchUnits(url: string, company: string): Promise<string[]> {
+  const doc = await postToTally(url, collectionRequest(company, "THUnits", "Unit", "Name"));
+  rejectLineError(doc);
+  return [...doc.getElementsByTagName("UNIT")].map(nameOf).filter(Boolean);
+}
+
+/** Voucher types under one parent, e.g. Sales gives "Sales" and a custom "Cash Sale". */
+export async function fetchVoucherTypes(url: string, company: string, parent: string): Promise<string[]> {
   const doc = await postToTally(url, collectionRequest(company, "THVoucherTypes", "VoucherType", "Name, Parent"));
   rejectLineError(doc);
   return [...doc.getElementsByTagName("VOUCHERTYPE")]
-    .filter((el) => childText(el, "PARENT") === "Sales")
+    .filter((el) => childText(el, "PARENT") === parent)
     .map(nameOf)
     .filter(Boolean);
 }

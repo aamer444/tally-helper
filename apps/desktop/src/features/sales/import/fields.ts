@@ -1,3 +1,5 @@
+import type { KindConfig } from "./kind";
+
 export type FieldId =
   | "date"
   | "invoiceNo"
@@ -23,19 +25,25 @@ export interface FieldDef {
 export type Mapping = Partial<Record<FieldId, number>>;
 
 export const FIELDS: FieldDef[] = [
-  { id: "date", label: "Invoice Date", required: true, synonyms: ["date", "invoice date", "inv date", "bill date", "voucher date", "vch date", "doc date"] },
-  { id: "invoiceNo", label: "Invoice No", required: true, synonyms: ["invoice no", "invoice number", "inv no", "invoice", "bill no", "bill number", "voucher no", "vch no", "doc no"] },
-  { id: "party", label: "Party / Customer", required: true, synonyms: ["party", "party name", "customer", "customer name", "buyer", "buyer name", "name", "particulars", "ledger", "account"] },
-  { id: "gstin", label: "GSTIN", required: false, synonyms: ["gstin", "gstin uin", "gst no", "gst number", "party gstin", "customer gstin", "gstin no"] },
+  { id: "date", label: "Invoice Date", required: true, synonyms: ["date", "invoice date", "inv date", "bill date", "voucher date", "vch date", "doc date", "supplier invoice date"] },
+  { id: "invoiceNo", label: "Invoice No", required: true, synonyms: ["invoice no", "invoice number", "inv no", "invoice", "bill no", "bill number", "voucher no", "vch no", "doc no", "supplier invoice no", "supplier bill no"] },
+  { id: "party", label: "Party / Customer", required: true, synonyms: ["party", "party name", "customer", "customer name", "buyer", "buyer name", "supplier", "supplier name", "seller", "vendor", "vendor name", "name", "particulars", "ledger", "account"] },
+  { id: "gstin", label: "GSTIN", required: false, synonyms: ["gstin", "gstin uin", "gst no", "gst number", "party gstin", "customer gstin", "supplier gstin", "gstin no"] },
   { id: "placeOfSupply", label: "Place of Supply", required: false, synonyms: ["place of supply", "pos", "state", "supply state"] },
   { id: "taxable", label: "Taxable Value", required: false, synonyms: ["taxable value", "taxable", "taxable amount", "assessable value", "basic amount", "amount before tax", "value", "sales value"] },
   { id: "gstRate", label: "GST Rate %", required: false, synonyms: ["gst rate", "tax rate", "gst %", "gst", "rate of tax", "rate %", "gst rate %"] },
   { id: "cgst", label: "CGST Amount", required: false, synonyms: ["cgst", "cgst amount", "cgst amt", "central tax"] },
   { id: "sgst", label: "SGST Amount", required: false, synonyms: ["sgst", "sgst amount", "sgst amt", "state tax", "utgst", "sgst utgst"] },
   { id: "igst", label: "IGST Amount", required: false, synonyms: ["igst", "igst amount", "igst amt", "integrated tax"] },
-  { id: "total", label: "Invoice Total", required: false, synonyms: ["total", "invoice total", "invoice value", "invoice amount", "total amount", "grand total", "bill amount", "gross amount", "net total", "amount"] },
+  { id: "total", label: "Invoice Total", required: false, synonyms: ["total", "invoice total", "invoice value", "invoice amount", "total amount", "grand total", "bill amount", "bill total", "bill value", "gross amount", "net total", "amount"] },
   { id: "narration", label: "Narration", required: false, synonyms: ["narration", "remarks", "description", "note", "notes"] },
 ];
+
+/** The same fields, worded for the kind of register being imported. */
+export function fieldsFor(kind: KindConfig): FieldDef[] {
+  const labels: Partial<Record<FieldId, string>> = { party: kind.partyLabel, invoiceNo: kind.invoiceNoLabel };
+  return FIELDS.map((f) => (labels[f.id] ? { ...f, label: labels[f.id]! } : f));
+}
 
 // Single words too vague to match inside a longer header ("GST Amount" is not a GST rate).
 const GENERIC = new Set(["gst", "name", "value", "amount", "total", "invoice", "date", "party", "account", "ledger", "state", "pos"]);

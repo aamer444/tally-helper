@@ -2,22 +2,38 @@ import { useState } from "react";
 import { CircleAlert, TriangleAlert, X } from "lucide-react";
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { formatPaise, formatTallyDate } from "../../lib/format";
-import type { SalesVoucher } from "./import/build-vouchers";
+import { CreateItemsCard } from "./CreateItemsCard";
+import { CreatePartyCard } from "./CreatePartyCard";
+import type { InvoiceVoucher, MissingItem } from "./import/build-vouchers";
+import { newPartyFor, type NewParty } from "./import/create-party";
 import { cellText } from "./import/fields";
-import { salesVoucherXml } from "./import/voucher-xml";
+import { voucherXml } from "./import/voucher-xml";
 
-const TABS = ["Summary", "Source Rows", "XML"] as const;
+type Tab = "Summary" | "Products" | "Source Rows" | "XML";
+
+/** What review can fix in Tally without leaving the app; absent when no company is open. */
+export interface MasterActions {
+  companyName: string;
+  /** Customer/supplier ledger names, for linking a party that bills spell differently. */
+  partyLedgers: string[];
+  units: string[];
+  linkParty: (nameOnBill: string, ledger: string) => void;
+  createParty: (party: NewParty) => Promise<void>;
+  createItems: (items: MissingItem[], unit: string) => Promise<void>;
+}
 
 interface VoucherPanelProps {
-  voucher: SalesVoucher;
+  voucher: InvoiceVoucher;
   headers: string[];
   sheetRows: unknown[][];
   voucherType: string;
+  actions: MasterActions | null;
   onClose: () => void;
 }
 
-export function VoucherPanel({ voucher, headers, sheetRows, voucherType, onClose }: VoucherPanelProps) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Summary");
+export function VoucherPanel({ voucher, headers, sheetRows, voucherType, actions, onClose }: VoucherPanelProps) {
+  const [tab, setTab] = useState<Tab>("Summary");
+  const tabs: Tab[] = voucher.items.length ? ["Summary", "Products", "Source Rows", "XML"] : ["Summary", "Source Rows", "XML"];
 
   return (
     <aside className="sticky top-4 flex max-h-[calc(100vh-12rem)] w-[360px] shrink-0 flex-col rounded-lg border border-slate-200 bg-white 2xl:w-[420px]">
@@ -30,7 +46,7 @@ export function VoucherPanel({ voucher, headers, sheetRows, voucherType, onClose
       </div>
 
       <div className="mt-3 flex gap-4 border-b border-slate-200 px-5 text-sm whitespace-nowrap">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t}
             type="button"
@@ -43,11 +59,37 @@ export function VoucherPanel({ voucher, headers, sheetRows, voucherType, onClose
       </div>
 
       <div className="overflow-y-auto p-5 text-sm">
-        {tab === "Summary" && <Summary voucher={voucher} />}
+        {tab === "Summary" && (
+          <>
+            {voucher.partyMissing && actions && (
+              <CreatePartyCard
+                key={voucher.partyOnBill}
+                initial={newPartyFor(voucher)}
+                nameOnBill={voucher.partyOnBill}
+                suggestions={voucher.partySuggestions}
+                partyLedgers={actions.partyLedgers}
+                companyName={actions.companyName}
+                onLink={(ledger) => actions.linkParty(voucher.partyOnBill, ledger)}
+                onCreate={actions.createParty}
+              />
+            )}
+            {voucher.missingItems.length > 0 && actions && (
+              <CreateItemsCard
+                key={voucher.id}
+                items={voucher.missingItems}
+                units={actions.units}
+                companyName={actions.companyName}
+                onCreate={actions.createItems}
+              />
+            )}
+            <Summary voucher={voucher} />
+          </>
+        )}
+        {tab === "Products" && <Products voucher={voucher} />}
         {tab === "Source Rows" && <SourceRows voucher={voucher} headers={headers} sheetRows={sheetRows} />}
         {tab === "XML" && (
           <pre className="overflow-x-auto rounded-md bg-slate-900 p-3 text-xs leading-relaxed text-slate-100">
-            {salesVoucherXml(voucher, voucherType)}
+            {voucherXml(voucher, voucherType)}
           </pre>
         )}
       </div>
@@ -55,7 +97,43 @@ export function VoucherPanel({ voucher, headers, sheetRows, voucherType, onClose
   );
 }
 
-function Issues({ voucher }: { voucher: SalesVoucher }) {
+function Products({ voucher }: { voucher: InvoiceVoucher }) {
+  const missing = new Set(voucher.missingItems.map((i) => i.name));
+  return (
+    <table className="w-full text-xs">
+      <thead className="bg-slate-50 text-slate-700">
+        <tr>
+          <th className="px-2 py-1.5 text-left font-medium">Product</th>
+          <th className="px-2 py-1.5 text-right font-medium">Qty</th>
+          <th className="px-2 py-1.5 text-right font-medium">Rate</th>
+          <th className="px-2 py-1.5 text-right font-medium">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {voucher.items.map((i, n) => (
+          <tr key={n} className="border-t border-slate-100">
+            <td className={`px-2 py-1 ${missing.has(i.name) ? "text-red-700" : ""}`}>{i.name}</td>
+            <td className="px-2 py-1 text-right whitespace-nowrap tabular-nums">
+              {i.qty} {i.unit}
+            </td>
+            <td className="px-2 py-1 text-right tabular-nums">{i.rate.toFixed(2)}</td>
+            <td className="px-2 py-1 text-right tabular-nums">{formatPaise(i.amount)}</td>
+          </tr>
+        ))}
+        {voucher.discount > 0 && (
+          <tr className="border-t border-slate-200">
+            <td colSpan={3} className="px-2 py-1 text-slate-600">
+              Less: discount
+            </td>
+            <td className="px-2 py-1 text-right tabular-nums">−{formatPaise(voucher.discount)}</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+function Issues({ voucher }: { voucher: InvoiceVoucher }) {
   if (!voucher.issues.length) return null;
   return (
     <ul className="mb-5 space-y-2">
@@ -75,7 +153,7 @@ function Issues({ voucher }: { voucher: SalesVoucher }) {
   );
 }
 
-function Summary({ voucher }: { voucher: SalesVoucher }) {
+function Summary({ voucher }: { voucher: InvoiceVoucher }) {
   const fields: [string, string][] = [
     ["Date", voucher.date ? formatTallyDate(voucher.date) : "–"],
     ["Party", voucher.party || "–"],
@@ -102,7 +180,7 @@ function Summary({ voucher }: { voucher: SalesVoucher }) {
   );
 }
 
-function LedgerTable({ voucher }: { voucher: SalesVoucher }) {
+function LedgerTable({ voucher }: { voucher: InvoiceVoucher }) {
   const sum = (key: "debit" | "credit") => voucher.lines.reduce((acc, l) => acc + l[key], 0);
   const cell = (paise: number) => (paise === 0 ? "–" : formatPaise(paise));
 

@@ -1,7 +1,7 @@
 import { errorMessage } from "../../../lib/errors";
 import { postToTally, TallyUnreachableError } from "../../tally/tally-client";
-import type { SalesVoucher } from "./build-vouchers";
-import { importVouchersXml, salesVoucherXml } from "./voucher-xml";
+import type { InvoiceVoucher } from "./build-vouchers";
+import { importVouchersXml, voucherXml } from "./voucher-xml";
 
 const IMPORT_TIMEOUT_MS = 60_000;
 
@@ -26,13 +26,13 @@ export function readImportResult(doc: Document): PushResult {
  * One voucher per request, so every error points at the right invoice.
  * Writes to the user's books: only call this after they confirm.
  */
-export async function pushVoucher(url: string, company: string, voucherType: string, v: SalesVoucher): Promise<PushResult> {
-  const xml = importVouchersXml(company, salesVoucherXml(v, voucherType));
+export async function pushVoucher(url: string, company: string, voucherType: string, v: InvoiceVoucher): Promise<PushResult> {
+  const xml = importVouchersXml(company, voucherXml(v, voucherType));
   try {
     return readImportResult(await postToTally(url, xml, IMPORT_TIMEOUT_MS));
   } catch (e) {
     if (e instanceof TallyUnreachableError) {
-      return { state: "unknown", message: "No reply from Tally. Check the Day Book in Tally before pushing this invoice again." };
+      return { state: "unknown", message: `No reply from Tally. Check the Day Book in Tally before pushing this ${v.kind === "purchase" ? "bill" : "invoice"} again.` };
     }
     return { state: "unknown", message: errorMessage(e) };
   }
