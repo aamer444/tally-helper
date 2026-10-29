@@ -1,0 +1,14 @@
+{
+  "name": "tally-helper",
+  "private": true,
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @th/tally-mock --filter @th/desktop dev",
+    "build": "pnpm --filter @th/desktop build",
+    "typecheck": "pnpm -r typecheck",
+    "mock": "pnpm --filter @th/tally-mock dev"
+  }
+}

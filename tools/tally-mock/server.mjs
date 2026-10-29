@@ -17,7 +17,27 @@ const tag = (xml, name) => xml.match(new RegExp(`<${name}(?:\\s[^>]*)?>([^<]*)</
 const companies = new Set([...sample('02-companies.res.xml').matchAll(/<COMPANY NAME="([^"]+)"/g)].map((m) => unescape(m[1])));
 const ledgers = new Set([...sample('03-ledgers.res.xml').matchAll(/<LEDGER NAME="([^"]+)"/g)].map((m) => unescape(m[1])));
 const vouchers = new Map(); // remoteId -> { alterId, xml }
+const createdLedgers = new Map(); // name -> <LEDGER> export block, so a re-read after a create sees it
+const stockSample = sample('06-stock-items.res.xml');
+const stockItems = new Set([...stockSample.matchAll(/<STOCKITEM NAME="([^"]+)"/g)].map((m) => unescape(m[1])));
+const units = new Set([...stockSample.matchAll(/<BASEUNITS[^>]*>([^<]+)</g)].map((m) => m[1]));
+const createdStockItems = new Map(); // name -> <STOCKITEM> export block
 let lastVchId = 5020;
+let lastMasterId = 100;
+
+/** The export shape of a ledger created through an All Masters import. */
+function ledgerExport(name, block) {
+  const field = (t) => tag(block, t) || '';
+  return `  <LEDGER NAME="${name}" RESERVEDNAME="">
+   <NAME TYPE="String">${name}</NAME>
+   <ALTERID TYPE="Number">${++lastMasterId}</ALTERID>
+   <PARENT TYPE="String">${field('PARENT')}</PARENT>
+   <PARTYGSTIN TYPE="String">${field('PARTYGSTIN')}</PARTYGSTIN>
+   <LEDSTATENAME TYPE="String">${field('LEDSTATENAME')}</LEDSTATENAME>
+   <ISBILLWISEON TYPE="Logical">${field('ISBILLWISEON') || 'No'}</ISBILLWISEON>
+  </LEDGER>
+`;
+}
 
 const collectionSamples = {
   COMPANY: '02-companies.res.xml', LEDGER: '03-ledgers.res.xml', GROUP: '04-groups.res.xml',
@@ -49,8 +69,12 @@ function checkVoucher(v) {
   // Top-level ledger lines only; bill/bank allocation amounts are nested inside and ignored.
   const lines = [...v.matchAll(/<(?:ALL)?LEDGERENTRIES\.LIST>\s*<LEDGERNAME>([^<]*)<\/LEDGERNAME>[\s\S]*?<AMOUNT>([^<]*)<\/AMOUNT>/g)];
   for (const [, name] of lines) if (!ledgers.has(unescape(name))) return `Ledger '${name}' does not exist!`;
-  const dr = lines.map((l) => toPaise(l[2])).filter((p) => p < 0).reduce((a, b) => a + b, 0);
-  const cr = lines.map((l) => toPaise(l[2])).filter((p) => p > 0).reduce((a, b) => a + b, 0);
+  // Item invoices: each stock line's first AMOUNT is its value; its ledger allocation repeats it and is not counted twice.
+  const stock = [...v.matchAll(/<ALLINVENTORYENTRIES\.LIST>\s*<STOCKITEMNAME>([^<]*)<\/STOCKITEMNAME>[\s\S]*?<AMOUNT>([^<]*)<\/AMOUNT>/g)];
+  for (const [, name] of stock) if (!stockItems.has(unescape(name))) return `Stock Item '${name}' does not exist!`;
+  const amounts = [...lines, ...stock].map((l) => toPaise(l[2]));
+  const dr = amounts.filter((p) => p < 0).reduce((a, b) => a + b, 0);
+  const cr = amounts.filter((p) => p > 0).reduce((a, b) => a + b, 0);
   if (dr + cr !== 0) return `Voucher totals do not match! Dr: ${formatAmt(dr)} Dr  Cr: ${formatAmt(cr)} Cr  Diff: ${formatAmt(dr + cr)} ${dr + cr < 0 ? 'Dr' : 'Cr'}`;
   return null;
 }
@@ -59,9 +83,21 @@ function handleImport(body) {
   const report = (tag(body, 'REPORTNAME') || '').toUpperCase();
   const res = { created: 0, altered: 0, deleted: 0, errors: [] };
   if (report === 'ALL MASTERS') {
-    for (const [, name] of body.matchAll(/<LEDGER NAME="([^"]+)"[^>]*>/g)) {
+    for (const [, name] of body.matchAll(/<UNIT NAME="([^"]+)"[^>]*>/g)) {
+      units.has(unescape(name)) ? res.altered++ : res.created++;
+      units.add(unescape(name));
+    }
+    for (const [block, name] of body.matchAll(/<STOCKITEM NAME="([^"]+)"[^>]*>[\s\S]*?<\/STOCKITEM>/g)) {
+      const unit = unescape(tag(block, 'BASEUNITS') || '');
+      if (!units.has(unit)) { res.errors.push(`Unit '${unit}' does not exist!`); continue; }
+      stockItems.has(unescape(name)) ? res.altered++ : res.created++;
+      stockItems.add(unescape(name));
+      createdStockItems.set(unescape(name), `  <STOCKITEM NAME="${name}" RESERVEDNAME=""><NAME TYPE="String">${name}</NAME><PARENT TYPE="String">Primary</PARENT><BASEUNITS TYPE="String">${tag(block, 'BASEUNITS')}</BASEUNITS></STOCKITEM>\n`);
+    }
+    for (const [block, name] of body.matchAll(/<LEDGER NAME="([^"]+)"[^>]*>[\s\S]*?<\/LEDGER>/g)) {
       ledgers.has(unescape(name)) ? res.altered++ : res.created++;
       ledgers.add(unescape(name));
+      createdLedgers.set(unescape(name), ledgerExport(name, block));
     }
     return importResult(res);
   }
@@ -93,6 +129,15 @@ function handle(body) {
   const type = (body.match(/<HEADER>[\s\S]*?<TYPE>([^<]*)<\/TYPE>/i)?.[1] || '').toUpperCase();
   if (type === 'COLLECTION') {
     const objType = (body.match(/<COLLECTION[^>]*>[\s\S]*?<TYPE>([^<]*)<\/TYPE>/i)?.[1] || '').toUpperCase();
+    if (objType === 'UNIT') {
+      return `<ENVELOPE>\n <HEADER><VERSION>1</VERSION><STATUS>1</STATUS></HEADER>\n <BODY><DESC></DESC><DATA><COLLECTION>\n${[...units].map((u) => `  <UNIT NAME="${u}"><NAME TYPE="String">${u}</NAME></UNIT>\n`).join('')} </COLLECTION></DATA></BODY>\n</ENVELOPE>`;
+    }
+    if (objType === 'STOCKITEM' && createdStockItems.size) {
+      return stockSample.replace(' </COLLECTION>', `${[...createdStockItems.values()].join('')} </COLLECTION>`);
+    }
+    if (objType === 'LEDGER' && createdLedgers.size) {
+      return sample(collectionSamples.LEDGER).replace(' </COLLECTION>', `${[...createdLedgers.values()].join('')} </COLLECTION>`);
+    }
     if (collectionSamples[objType]) return sample(collectionSamples[objType]);
   }
   const id = (body.match(/<HEADER>[\s\S]*?<ID>([^<]*)<\/ID>/i)?.[1] || tag(body, 'REPORTNAME') || '').toUpperCase();

@@ -166,7 +166,10 @@ $(LED 'Sales Return 18%' 24 'Sales Accounts' '' $M No 0.00 0.00)
 $(LED 'Purchase Return 18%' 25 'Purchase Accounts' '' $M No 0.00 0.00)
 $(LED 'Bank Charges' 26 'Indirect Expenses' '' $M No 0.00 -236.00)
 $(LED 'Round Off' 27 'Indirect Expenses' '' $M No 0.00 0.00)
-$(LED 'Suspense A/c' 28 'Suspense A/c' '' $M No 0.00 0.00)" > 03-ledgers.res.xml
+$(LED 'Suspense A/c' 28 'Suspense A/c' '' $M No 0.00 0.00)
+$(LED 'Input IGST 18%' 29 'Duties &amp; Taxes' '' $M No 0.00 0.00)
+$(LED 'Delhi Footwear Co' 30 'Sundry Creditors' 07AAACD1234E1ZB Delhi Yes 0.00 0.00)
+$(LED 'Discount Received' 31 'Indirect Incomes' '' $M No 0.00 0.00)" > 03-ledgers.res.xml
 
 # ---------- 04 groups ----------
 env_exp Collection GroupList "" '   <COLLECTION NAME="GroupList" ISMODIFY="No">

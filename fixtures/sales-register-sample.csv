@@ -1,0 +1,11 @@
+Demo Traders - Sales Register April 2025 (made-up data for testing)
+,,,,,,,,
+Date,Invoice No,Customer Name,GSTIN,Place of Supply,Taxable Value,GST %,Total,Remarks
+05/04/2025,INV-101,ABC Traders,,Maharashtra,"10,000.00",18,"11,800.00",
+05/04/2025,INV-102,XYZ Agencies,,Karnataka,5000,18,5900,Inter-state: IGST
+06/04/2025,INV-103,ABC Traders,,Maharashtra,2000,18,,Two lines on one invoice
+06/04/2025,INV-103,ABC Traders,,Maharashtra,1500.50,18,,
+07/04/2025,INV-104,Shree Ganesh Stores,,Maharashtra,4000,18,4720,Party not in Tally: error
+08/04/2025,INV-105,ABC Traders,27AAPFU0939F1ZW,Maharashtra,999.60,18,1180,GSTIN typo (warning) and round off
+15/03/2025,INV-106,ABC Traders,,Maharashtra,1000,18,1180,Before books begin: error
+,Grand Total,,,,"24,499.60",,,

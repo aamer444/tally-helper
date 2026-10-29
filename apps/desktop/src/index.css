@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+@theme {
+  --font-sans: "Inter Variable", "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  @apply bg-slate-50 font-sans text-slate-900 antialiased;
+}

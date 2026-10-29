@@ -1,0 +1,7 @@
+# Slow or flaky connections: retry crate downloads longer and avoid HTTP/2 drops.
+[net]
+retry = 10
+
+[http]
+timeout = 180
+multiplexing = false
