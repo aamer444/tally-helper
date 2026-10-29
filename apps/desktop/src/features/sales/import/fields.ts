@@ -2,6 +2,7 @@ import type { KindConfig } from "./kind";
 
 export type FieldId =
   | "date"
+  | "originalInvoiceNo"
   | "invoiceNo"
   | "party"
   | "gstin"
@@ -26,7 +27,9 @@ export type Mapping = Partial<Record<FieldId, number>>;
 
 export const FIELDS: FieldDef[] = [
   { id: "date", label: "Invoice Date", required: true, synonyms: ["date", "invoice date", "inv date", "bill date", "voucher date", "vch date", "doc date", "supplier invoice date"] },
-  { id: "invoiceNo", label: "Invoice No", required: true, synonyms: ["invoice no", "invoice number", "inv no", "invoice", "bill no", "bill number", "voucher no", "vch no", "doc no", "supplier invoice no", "supplier bill no"] },
+  // Before Invoice No, so "Original Invoice No" is not taken for the note's own number.
+  { id: "originalInvoiceNo", label: "Original Invoice No", required: false, synonyms: ["original invoice no", "original invoice number", "original invoice", "orig inv no", "original bill no", "against invoice", "against invoice no", "agst invoice", "ref invoice no", "invoice ref", "reference invoice no"] },
+  { id: "invoiceNo", label: "Invoice No", required: true, synonyms: ["credit note no", "debit note no", "note no", "note number", "cn no", "dn no", "invoice no", "invoice number", "inv no", "invoice", "bill no", "bill number", "voucher no", "vch no", "doc no", "supplier invoice no", "supplier bill no"] },
   { id: "party", label: "Party / Customer", required: true, synonyms: ["party", "party name", "customer", "customer name", "buyer", "buyer name", "supplier", "supplier name", "seller", "vendor", "vendor name", "name", "particulars", "ledger", "account"] },
   { id: "gstin", label: "GSTIN", required: false, synonyms: ["gstin", "gstin uin", "gst no", "gst number", "party gstin", "customer gstin", "supplier gstin", "gstin no"] },
   { id: "placeOfSupply", label: "Place of Supply", required: false, synonyms: ["place of supply", "pos", "state", "supply state"] },
@@ -42,7 +45,9 @@ export const FIELDS: FieldDef[] = [
 /** The same fields, worded for the kind of register being imported. */
 export function fieldsFor(kind: KindConfig): FieldDef[] {
   const labels: Partial<Record<FieldId, string>> = { party: kind.partyLabel, invoiceNo: kind.invoiceNoLabel };
-  return FIELDS.map((f) => (labels[f.id] ? { ...f, label: labels[f.id]! } : f));
+  // Only a credit or debit note points back at an original invoice.
+  const fields = kind.isReturn ? FIELDS : FIELDS.filter((f) => f.id !== "originalInvoiceNo");
+  return fields.map((f) => (labels[f.id] ? { ...f, label: labels[f.id]! } : f));
 }
 
 // Single words too vague to match inside a longer header ("GST Amount" is not a GST rate).
@@ -54,12 +59,17 @@ const normalise = (s: string) => s.toLowerCase().replace(/[^a-z0-9%]+/g, " ").tr
 
 /** Guesses which column holds which field from the header text. Each column is used once. */
 export function autoMap(headers: string[]): Mapping {
-  const mapping: Mapping = {};
+  return autoMapFields(headers, FIELDS);
+}
+
+/** autoMap for any set of fields, e.g. a bank statement's. */
+export function autoMapFields<F extends string>(headers: string[], fields: { id: F; synonyms: string[] }[]): Partial<Record<F, number>> {
+  const mapping: Partial<Record<F, number>> = {};
   const used = new Set<number>();
   const names = headers.map(normalise);
 
   const claim = (matches: (name: string, synonym: string) => boolean) => {
-    for (const field of FIELDS) {
+    for (const field of fields) {
       if (mapping[field.id] !== undefined) continue;
       const col = names.findIndex((name, i) => name && !used.has(i) && field.synonyms.some((s) => matches(name, s)));
       if (col >= 0) {
@@ -74,11 +84,11 @@ export function autoMap(headers: string[]): Mapping {
 }
 
 /** Registers often start with a title or company name; the header is the row that looks most like one. */
-export function findHeaderRow(rows: unknown[][]): number {
+export function findHeaderRow(rows: unknown[][], fields: { id: string; synonyms: string[] }[] = FIELDS): number {
   let best = 0;
   let bestScore = 0;
   rows.slice(0, HEADER_SEARCH_ROWS).forEach((row, i) => {
-    const score = Object.keys(autoMap(row.map(cellText))).length;
+    const score = Object.keys(autoMapFields(row.map(cellText), fields)).length;
     if (score > bestScore) {
       best = i;
       bestScore = score;

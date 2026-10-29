@@ -8,18 +8,19 @@ function entryXml(line: LedgerLine, tag = "ALLLEDGERENTRIES.LIST"): string {
   const amount = paiseToTally(isDebit ? -line.debit : line.credit);
   const party = tag === "LEDGERENTRIES.LIST" && line.role === "Party" ? "<ISPARTYLEDGER>Yes</ISPARTYLEDGER>" : "";
   const bill = line.billRef
-    ? `<BILLALLOCATIONS.LIST><NAME>${e(line.billRef)}</NAME><BILLTYPE>New Ref</BILLTYPE><AMOUNT>${amount}</AMOUNT></BILLALLOCATIONS.LIST>`
+    ? `<BILLALLOCATIONS.LIST><NAME>${e(line.billRef)}</NAME><BILLTYPE>${line.billType ?? "New Ref"}</BILLTYPE><AMOUNT>${amount}</AMOUNT></BILLALLOCATIONS.LIST>`
     : "";
   return `<${tag}><LEDGERNAME>${e(line.ledger)}</LEDGERNAME><ISDEEMEDPOSITIVE>${isDebit ? "Yes" : "No"}</ISDEEMEDPOSITIVE>${party}<AMOUNT>${amount}</AMOUNT>${bill}</${tag}>`;
 }
 
-/** One stock line, with the purchase/sales ledger it is booked to nested inside (item invoice mode). */
+/** One stock line, with the purchase/sales ledger it is booked to nested inside (item invoice mode). AMOUNT is after Disc %. */
 function inventoryXml(item: VoucherItem, ledger: string, isDebit: boolean): string {
   const amount = paiseToTally(isDebit ? -item.amount : item.amount);
   const qty = `${item.qty} ${item.unit}`;
+  const discount = item.discountPct ? `<DISCOUNT>${item.discountPct}</DISCOUNT>` : "";
   return [
     `<ALLINVENTORYENTRIES.LIST><STOCKITEMNAME>${e(item.name)}</STOCKITEMNAME><ISDEEMEDPOSITIVE>${isDebit ? "Yes" : "No"}</ISDEEMEDPOSITIVE>`,
-    `<RATE>${item.rate.toFixed(2)}/${e(item.unit)}</RATE><AMOUNT>${amount}</AMOUNT><ACTUALQTY> ${e(qty)}</ACTUALQTY><BILLEDQTY> ${e(qty)}</BILLEDQTY>`,
+    `<RATE>${item.rate.toFixed(2)}/${e(item.unit)}</RATE>${discount}<AMOUNT>${amount}</AMOUNT><ACTUALQTY> ${e(qty)}</ACTUALQTY><BILLEDQTY> ${e(qty)}</BILLEDQTY>`,
     `<ACCOUNTINGALLOCATIONS.LIST><LEDGERNAME>${e(ledger)}</LEDGERNAME><ISDEEMEDPOSITIVE>${isDebit ? "Yes" : "No"}</ISDEEMEDPOSITIVE><AMOUNT>${amount}</AMOUNT></ACCOUNTINGALLOCATIONS.LIST>`,
     `</ALLINVENTORYENTRIES.LIST>`,
   ].join("");

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { errorMessage } from "../../lib/errors";
-import { fetchLedgers, fetchStockItems, fetchUnits, fetchVoucherTypes } from "./masters";
+import { fetchEducationalMode, fetchLedgers, fetchStockItems, fetchUnits, fetchVoucherTypes } from "./masters";
 import type { Company, Ledger, StockItem } from "./types";
 
 export interface Masters {
@@ -11,6 +11,8 @@ export interface Masters {
   voucherTypes: string[];
   stockItems: StockItem[];
   units: string[];
+  /** Tally runs unlicensed and takes vouchers dated only the 1st, 2nd or 31st. */
+  educational: boolean;
   error: string | null;
   reload: () => Promise<void>;
 }
@@ -21,6 +23,7 @@ interface Loaded {
   voucherTypes: string[];
   stockItems: StockItem[];
   units: string[];
+  educational: boolean;
 }
 
 const NONE: never[] = [];
@@ -38,14 +41,15 @@ export function useMasters(url: string, company: Company | null, voucherParent: 
     if (!companyName) return;
     setRefreshing(true);
     try {
-      const [ledgers, voucherTypes, stockItems, units] = await Promise.all([
+      const [ledgers, voucherTypes, stockItems, units, educational] = await Promise.all([
         fetchLedgers(url, companyName),
         fetchVoucherTypes(url, companyName, voucherParent),
         fetchStockItems(url, companyName),
         fetchUnits(url, companyName),
+        fetchEducationalMode(url),
       ]);
       if (request !== latestRequest.current) return;
-      setLoaded({ company: companyName, ledgers: ledgers.sort((a, b) => a.name.localeCompare(b.name)), voucherTypes, stockItems, units });
+      setLoaded({ company: companyName, ledgers: ledgers.sort((a, b) => a.name.localeCompare(b.name)), voucherTypes, stockItems, units, educational });
       setFailure(null);
     } catch (e) {
       if (request === latestRequest.current) setFailure({ company: companyName, message: errorMessage(e) });
@@ -72,6 +76,7 @@ export function useMasters(url: string, company: Company | null, voucherParent: 
     voucherTypes: current?.voucherTypes ?? NONE,
     stockItems: current?.stockItems ?? NONE,
     units: current?.units ?? NONE,
+    educational: current?.educational ?? false,
     error,
     reload,
   };

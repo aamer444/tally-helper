@@ -1,21 +1,29 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, CircleStop, Play, RotateCcw, ShieldAlert, Upload } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
 import { formatPaise, formatTallyDate } from "../../../lib/format";
-import type { Company } from "../../tally/types";
-import type { InvoiceVoucher } from "../import/build-vouchers";
-import type { KindConfig } from "../import/kind";
-import { pushVoucher, type PushResult } from "../import/push";
+import type { Paise } from "../../../lib/money";
+import type { PushResult } from "../import/push";
 import { StepFooter } from "./StepFooter";
 
 type Phase = "confirm" | "running" | "finished";
 
-interface PushStepProps {
-  kind: KindConfig;
-  vouchers: InvoiceVoucher[];
-  company: Company;
-  url: string;
-  voucherType: string;
+/** What the results table shows for one item being pushed. */
+export interface PushRow {
+  date: string | null;
+  reference: string;
+  party: string;
+  amount: Paise;
+}
+
+interface PushStepProps<T extends { id: string }> {
+  items: T[];
+  describe: (item: T) => PushRow;
+  /** Sends one item to Tally. Writes to the user's books: called only after they confirm. */
+  push: (item: T) => Promise<PushResult>;
+  /** What will be created where, shown before anything is sent. */
+  confirm: ReactNode;
+  referenceLabel: string;
   onBack: () => void;
   onNewImport: () => void;
 }
@@ -27,7 +35,8 @@ const RESULT_LABEL: Record<PushResult["state"], { text: string; className: strin
   unknown: { text: "Not sure", className: "text-amber-700" },
 };
 
-export function PushStep({ kind, vouchers, company, url, voucherType, onBack, onNewImport }: PushStepProps) {
+/** Confirm, then send one item at a time with progress, stop, continue and retry; shared by every import. */
+export function PushStep<T extends { id: string }>({ items: vouchers, describe, push, confirm, referenceLabel, onBack, onNewImport }: PushStepProps<T>) {
   const [phase, setPhase] = useState<Phase>("confirm");
   const [results, setResults] = useState<ReadonlyMap<string, PushResult>>(new Map());
   const stopRequested = useRef(false);
@@ -35,14 +44,13 @@ export function PushStep({ kind, vouchers, company, url, voucherType, onBack, on
   const done = vouchers.filter((v) => results.has(v.id)).length;
   const count = (state: PushResult["state"]) => [...results.values()].filter((r) => r.state === state).length;
   const failed = vouchers.filter((v) => results.get(v.id)?.state === "failed");
-  const total = vouchers.reduce((n, v) => n + v.total, 0);
 
-  async function run(list: InvoiceVoucher[]) {
+  async function run(list: T[]) {
     stopRequested.current = false;
     setPhase("running");
     for (const v of list) {
       if (stopRequested.current) break;
-      const result = await pushVoucher(url, company.name, voucherType, v);
+      const result = await push(v);
       setResults((prev) => new Map(prev).set(v.id, result));
     }
     setPhase("finished");
@@ -56,10 +64,7 @@ export function PushStep({ kind, vouchers, company, url, voucherType, onBack, on
             <h2 className="flex items-center gap-2 text-lg font-semibold">
               <ShieldAlert size={20} /> Check before pushing
             </h2>
-            <p className="mt-2">
-              This will create <b>{vouchers.length}</b> {kind.mainRole.toLowerCase()} vouchers worth <b>₹{formatPaise(total)}</b> in the Tally company{" "}
-              <b>{company.name}</b>, using voucher type <b>{voucherType}</b>.
-            </p>
+            <p className="mt-2">{confirm}</p>
             <p className="mt-2">
               Take a backup in Tally first (<b>Data → Backup</b>). Keep Tally open until this finishes.
             </p>
@@ -67,7 +72,7 @@ export function PushStep({ kind, vouchers, company, url, voucherType, onBack, on
         ) : (
           <Progress done={done} total={vouchers.length} created={count("created")} altered={count("altered")} failed={count("failed")} unknown={count("unknown")} />
         )}
-        <ResultsTable vouchers={vouchers} results={results} />
+        <ResultsTable rows={vouchers.map((v) => ({ id: v.id, ...describe(v) }))} results={results} referenceLabel={referenceLabel} />
       </div>
 
       <StepFooter info={phase === "running" ? "Pushing… you can stop after the current voucher." : undefined}>
@@ -134,29 +139,35 @@ function Progress(p: { done: number; total: number; created: number; altered: nu
   );
 }
 
-function ResultsTable({ vouchers, results }: { vouchers: InvoiceVoucher[]; results: ReadonlyMap<string, PushResult> }) {
+interface ResultsTableProps {
+  rows: (PushRow & { id: string })[];
+  results: ReadonlyMap<string, PushResult>;
+  referenceLabel: string;
+}
+
+function ResultsTable({ rows, results, referenceLabel }: ResultsTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
       <table className="w-full text-sm">
         <thead className="bg-slate-50 text-slate-700">
           <tr>
-            {["Date", "Invoice No", "Party", "Total (₹)", "Result"].map((h) => (
-              <th key={h} className={`px-3 py-2.5 font-medium whitespace-nowrap ${h.startsWith("Total") ? "text-right" : "text-left"}`}>
+            {["Date", referenceLabel, "Party / Ledger", "Amount (₹)", "Result"].map((h) => (
+              <th key={h} className={`px-3 py-2.5 font-medium whitespace-nowrap ${h.startsWith("Amount") ? "text-right" : "text-left"}`}>
                 {h}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {vouchers.map((v) => {
+          {rows.map((v) => {
             const r = results.get(v.id);
             const label = r && RESULT_LABEL[r.state];
             return (
               <tr key={v.id} className="border-t border-slate-100">
                 <td className="px-3 py-2 whitespace-nowrap">{v.date ? formatTallyDate(v.date) : "–"}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{v.invoiceNo}</td>
+                <td className="px-3 py-2 whitespace-nowrap">{v.reference}</td>
                 <td className="px-3 py-2">{v.party}</td>
-                <td className="px-3 py-2 text-right tabular-nums">{formatPaise(v.total)}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{formatPaise(v.amount)}</td>
                 <td className="px-3 py-2">
                   {label ? (
                     <span className={label.className}>

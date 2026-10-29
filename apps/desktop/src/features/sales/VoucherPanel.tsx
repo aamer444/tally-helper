@@ -4,12 +4,15 @@ import { StatusBadge } from "../../components/ui/StatusBadge";
 import { formatPaise, formatTallyDate } from "../../lib/format";
 import { CreateItemsCard } from "./CreateItemsCard";
 import { CreatePartyCard } from "./CreatePartyCard";
+import { MissingLedgersCard, type LedgerFix } from "./MissingLedgersCard";
 import type { InvoiceVoucher, MissingItem } from "./import/build-vouchers";
 import { newPartyFor, type NewParty } from "./import/create-party";
 import { cellText } from "./import/fields";
-import { voucherXml } from "./import/voucher-xml";
+import { Button } from "../../components/ui/Button";
+import { errorMessage } from "../../lib/errors";
+import type { Ledger } from "../tally/types";
 
-type Tab = "Summary" | "Products" | "Source Rows" | "XML";
+type Tab = "Summary" | "Products" | "Source Rows";
 
 /** What review can fix in Tally without leaving the app; absent when no company is open. */
 export interface MasterActions {
@@ -17,23 +20,26 @@ export interface MasterActions {
   /** Customer/supplier ledger names, for linking a party that bills spell differently. */
   partyLedgers: string[];
   units: string[];
+  /** Every ledger in the company, for pointing a missing role at an existing one. */
+  ledgers: Ledger[];
+  fixLedgers: (fixes: LedgerFix[]) => Promise<void>;
   linkParty: (nameOnBill: string, ledger: string) => void;
   createParty: (party: NewParty) => Promise<void>;
   createItems: (items: MissingItem[], unit: string) => Promise<void>;
+  saveHsn: (items: MissingItem[]) => Promise<void>;
 }
 
 interface VoucherPanelProps {
   voucher: InvoiceVoucher;
   headers: string[];
   sheetRows: unknown[][];
-  voucherType: string;
   actions: MasterActions | null;
   onClose: () => void;
 }
 
-export function VoucherPanel({ voucher, headers, sheetRows, voucherType, actions, onClose }: VoucherPanelProps) {
+export function VoucherPanel({ voucher, headers, sheetRows, actions, onClose }: VoucherPanelProps) {
   const [tab, setTab] = useState<Tab>("Summary");
-  const tabs: Tab[] = voucher.items.length ? ["Summary", "Products", "Source Rows", "XML"] : ["Summary", "Source Rows", "XML"];
+  const tabs: Tab[] = voucher.items.length ? ["Summary", "Products", "Source Rows"] : ["Summary", "Source Rows"];
 
   return (
     <aside className="sticky top-4 flex max-h-[calc(100vh-12rem)] w-[360px] shrink-0 flex-col rounded-lg border border-slate-200 bg-white 2xl:w-[420px]">
@@ -61,6 +67,16 @@ export function VoucherPanel({ voucher, headers, sheetRows, voucherType, actions
       <div className="overflow-y-auto p-5 text-sm">
         {tab === "Summary" && (
           <>
+            {voucher.missingLedgers.length > 0 && actions && (
+              <MissingLedgersCard
+                key={voucher.missingLedgers.join()}
+                kind={voucher.kind}
+                roles={voucher.missingLedgers}
+                ledgers={actions.ledgers}
+                companyName={actions.companyName}
+                onFix={actions.fixLedgers}
+              />
+            )}
             {voucher.partyMissing && actions && (
               <CreatePartyCard
                 key={voucher.partyOnBill}
@@ -82,18 +98,49 @@ export function VoucherPanel({ voucher, headers, sheetRows, voucherType, actions
                 onCreate={actions.createItems}
               />
             )}
+            {voucher.hsnMissing.length > 0 && actions && <HsnCard key={voucher.id} items={voucher.hsnMissing} onSave={actions.saveHsn} />}
             <Summary voucher={voucher} />
           </>
         )}
         {tab === "Products" && <Products voucher={voucher} />}
         {tab === "Source Rows" && <SourceRows voucher={voucher} headers={headers} sheetRows={sheetRows} />}
-        {tab === "XML" && (
-          <pre className="overflow-x-auto rounded-md bg-slate-900 p-3 text-xs leading-relaxed text-slate-100">
-            {voucherXml(voucher, voucherType)}
-          </pre>
-        )}
       </div>
     </aside>
+  );
+}
+
+/** Products already in Tally that lack the HSN code the bill prints. */
+function HsnCard({ items, onSave }: { items: MissingItem[]; onSave: (items: MissingItem[]) => Promise<void> }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  async function save() {
+    setBusy(true);
+    setError(null);
+    try {
+      await onSave(items);
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <section className="mb-5 rounded-md border border-blue-200 bg-blue-50 p-3">
+      <h3 className="font-semibold text-blue-900">
+        {items.length} product{items.length > 1 ? "s" : ""} in Tally {items.length > 1 ? "have" : "has"} no HSN code
+      </h3>
+      <ul className="mt-2 max-h-28 space-y-0.5 overflow-y-auto text-xs text-slate-700">
+        {items.map((i) => (
+          <li key={i.name}>
+            {i.name} → <b>{i.hsn}</b>
+          </li>
+        ))}
+      </ul>
+      {error && <p className="mt-2 text-red-700">{error}</p>}
+      <Button variant="primary" className="mt-2 px-3 py-1.5" disabled={busy} onClick={() => void save()}>
+        {busy ? "Saving…" : "Save HSN codes from the bill"}
+      </Button>
+    </section>
   );
 }
 
@@ -106,6 +153,7 @@ function Products({ voucher }: { voucher: InvoiceVoucher }) {
           <th className="px-2 py-1.5 text-left font-medium">Product</th>
           <th className="px-2 py-1.5 text-right font-medium">Qty</th>
           <th className="px-2 py-1.5 text-right font-medium">Rate</th>
+          <th className="px-2 py-1.5 text-right font-medium">Disc %</th>
           <th className="px-2 py-1.5 text-right font-medium">Amount</th>
         </tr>
       </thead>
@@ -117,15 +165,15 @@ function Products({ voucher }: { voucher: InvoiceVoucher }) {
               {i.qty} {i.unit}
             </td>
             <td className="px-2 py-1 text-right tabular-nums">{i.rate.toFixed(2)}</td>
+            <td className="px-2 py-1 text-right tabular-nums">{i.discountPct || "–"}</td>
             <td className="px-2 py-1 text-right tabular-nums">{formatPaise(i.amount)}</td>
           </tr>
         ))}
         {voucher.discount > 0 && (
           <tr className="border-t border-slate-200">
-            <td colSpan={3} className="px-2 py-1 text-slate-600">
-              Less: discount
+            <td colSpan={5} className="px-2 py-1 text-slate-600">
+              Discount on the bill: ₹{formatPaise(voucher.discount)} (amounts are after it)
             </td>
-            <td className="px-2 py-1 text-right tabular-nums">−{formatPaise(voucher.discount)}</td>
           </tr>
         )}
       </tbody>

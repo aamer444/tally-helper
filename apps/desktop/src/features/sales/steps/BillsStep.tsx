@@ -3,8 +3,12 @@ import { Button } from "../../../components/ui/Button";
 import type { Masters } from "../../tally/useMasters";
 import type { InvoiceSettings } from "../import/build-vouchers";
 import type { KindConfig } from "../import/kind";
+import type { LedgerKey } from "../import/standard-ledgers";
 import { supplierGstin } from "../pdf/bills";
 import type { PdfBill } from "../pdf/parse-bill";
+import type { BillDiscount } from "../pdf/parse-items";
+import { formatPaise } from "../../../lib/format";
+import { parseAmount } from "../../../lib/money";
 import { ledgerBlockers, LedgersCard } from "./LedgersCard";
 import { StepFooter } from "./StepFooter";
 import { CARD } from "./styles";
@@ -34,11 +38,12 @@ interface BillsStepProps {
   settings: InvoiceSettings;
   onSettingsChange: (patch: Partial<InvoiceSettings>) => void;
   masters: Masters;
+  onCreateLedger: (key: LedgerKey) => Promise<void>;
   onBack: () => void;
   onNext: () => void;
 }
 
-export function BillsStep({ kind, bills, onBillsChange, settings, onSettingsChange, masters, onBack, onNext }: BillsStepProps) {
+export function BillsStep({ kind, bills, onBillsChange, settings, onSettingsChange, masters, onCreateLedger, onBack, onNext }: BillsStepProps) {
   const knownGstins = new Set(masters.ledgers.map((l) => l.gstin).filter(Boolean));
   const blockers = ledgerBlockers(kind, settings, masters);
   const incomplete = bills.filter((b) => COLUMNS.some((c) => isMissing(b, c.key))).length;
@@ -59,6 +64,9 @@ export function BillsStep({ kind, bills, onBillsChange, settings, onSettingsChan
                 <tr>
                   <th className="px-2 py-2 text-left font-medium">File</th>
                   <th className="px-2 py-2 text-right font-medium">Products</th>
+                  <th className="px-2 py-2 text-left font-medium" title="Blank: worked out from the bill (products less taxable value)">
+                    Discount
+                  </th>
                   {COLUMNS.map((c) => (
                     <th key={c.key} className={`px-2 py-2 font-medium whitespace-nowrap ${c.amount ? "text-right" : "text-left"}`}>
                       {c.label}
@@ -80,7 +88,7 @@ export function BillsStep({ kind, bills, onBillsChange, settings, onSettingsChan
             </table>
           </div>
         </section>
-        <LedgersCard kind={kind} settings={settings} onSettingsChange={onSettingsChange} masters={masters} />
+        <LedgersCard kind={kind} settings={settings} onSettingsChange={onSettingsChange} masters={masters} onCreateLedger={onCreateLedger} />
       </div>
       <StepFooter
         info={
@@ -118,6 +126,9 @@ function BillRow({ bill, listId, resolvedGstin, onChange }: BillRowProps) {
       <td className="px-2 py-1.5 text-right text-slate-600 tabular-nums" title="Product lines read from the bill">
         {bill.items.lines.length || "–"}
       </td>
+      <td className="px-1 py-1.5">
+        <DiscountInput bill={bill} onChange={(discount) => onChange({ items: { ...bill.items, discount } })} />
+      </td>
       {COLUMNS.map((c) => (
         <td key={c.key} className="px-1 py-1.5">
           <input
@@ -139,5 +150,42 @@ function BillRow({ bill, listId, resolvedGstin, onChange }: BillRowProps) {
         </td>
       ))}
     </tr>
+  );
+}
+
+const NO_DISCOUNT: BillDiscount = { value: "", mode: "percent" };
+
+/** What the bill itself implies: products total less taxable value, as a % or in rupees. */
+function discountOnBill(bill: PdfBill, mode: BillDiscount["mode"]): string {
+  const gross = bill.items.lines.reduce((sum, l) => sum + (parseAmount(l.amount) ?? 0), 0);
+  const taxable = parseAmount(bill.taxable);
+  if (!gross || taxable === null || gross <= taxable) return "0";
+  const amount = gross - taxable;
+  return mode === "percent" ? String(Math.round((amount / gross) * 10_000) / 100) : formatPaise(amount);
+}
+
+/** Discount as a % or an amount; left blank, the bill's own figure is used (shown greyed). */
+function DiscountInput({ bill, onChange }: { bill: PdfBill; onChange: (d: BillDiscount) => void }) {
+  const discount = bill.items.discount ?? NO_DISCOUNT;
+  if (!bill.items.lines.length) return <span className="px-2 text-slate-400">–</span>;
+  return (
+    <div className="flex w-36 rounded-md border border-slate-200 focus-within:border-blue-500">
+      <input
+        aria-label={`Discount for ${bill.fileName}`}
+        value={discount.value}
+        placeholder={discountOnBill(bill, discount.mode)}
+        onChange={(e) => onChange({ ...discount, value: e.target.value })}
+        className="w-full min-w-0 rounded-l-md px-2 py-1 text-right tabular-nums outline-none"
+      />
+      <select
+        aria-label={`Discount type for ${bill.fileName}`}
+        value={discount.mode}
+        onChange={(e) => onChange({ value: "", mode: e.target.value as BillDiscount["mode"] })}
+        className="rounded-r-md border-l border-slate-200 bg-slate-50 px-1 text-slate-700 outline-none"
+      >
+        <option value="percent">%</option>
+        <option value="amount">₹</option>
+      </select>
+    </div>
   );
 }

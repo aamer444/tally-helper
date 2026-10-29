@@ -3,11 +3,13 @@ import { parseDateCell } from "../../../lib/dates";
 import { formatPaise, formatTallyDate } from "../../../lib/format";
 import { parseAmount, type Paise } from "../../../lib/money";
 import type { Company, Ledger, StockItem } from "../../tally/types";
-import type { BillItems } from "../pdf/parse-items";
+import type { BillDiscount, BillItems } from "../pdf/parse-items";
 import { cellText, fieldsFor, type FieldId, type Mapping } from "./fields";
 import { GST_RATES, isValidGstin, stateCodeOf } from "./gst";
 import { KINDS, type InvoiceKind, type KindConfig } from "./kind";
 import { partyKey, suggestParties } from "./party-match";
+import type { LedgerRole } from "./standard-ledgers";
+import { educationalDate } from "../../tally/educational";
 
 const MAX_ROUND_OFF: Paise = 100; // a gap of up to ₹1 between the file's total and taxable + tax
 const TOTAL_ROW = /^(grand\s*)?(sub\s*)?total\b/i;
@@ -19,19 +21,19 @@ export interface InvoiceSettings {
   sgstLedger: string;
   igstLedger: string;
   roundOffLedger: string;
-  /** Takes a bill's discount when its product lines add up to more than the taxable value. */
-  discountLedger: string;
   /** Enter bills that list products as item invoices, so Tally updates stock. */
   withStock: boolean;
 }
 
 export interface LedgerLine {
-  role: "Party" | "Sales" | "Purchase" | "CGST" | "SGST" | "IGST" | "Discount" | "Round Off";
+  role: "Party" | "Sales" | "Purchase" | "CGST" | "SGST" | "IGST" | "Round Off";
   ledger: string;
   debit: Paise;
   credit: Paise;
   /** Set on the party line when its ledger keeps bill-wise details. */
   billRef?: string;
+  /** A note settles the original invoice (Agst Ref); anything else opens a new bill. */
+  billType?: "New Ref" | "Agst Ref";
 }
 
 export interface Issue {
@@ -67,6 +69,11 @@ export interface InvoiceVoucher {
   items: VoucherItem[];
   /** Products on the bill that have no stock item in Tally yet. */
   missingItems: MissingItem[];
+  /** Products in Tally without an HSN code that the bill prints one for. */
+  hsnMissing: MissingItem[];
+  /** Purchase/sales, tax or round-off ledgers this voucher needs that are not chosen or not in Tally. */
+  missingLedgers: LedgerRole[];
+  /** The bill's trade discount on its products, in total; each stock line carries it as Disc %. */
   discount: Paise;
   issues: Issue[];
   status: ReviewStatus;
@@ -77,6 +84,9 @@ export interface VoucherItem {
   qty: number;
   unit: string;
   rate: number;
+  /** Disc % on the line, as accountants type it in Tally's item invoice; 0 for none. */
+  discountPct: number;
+  /** After the discount. */
   amount: Paise;
 }
 
@@ -100,6 +110,10 @@ export interface BuildInput {
   stockItems?: StockItem[];
   /** The user's earlier choices: a party name as bills print it (partyKey) → the Tally ledger it is. */
   partyAliases?: ReadonlyMap<string, string>;
+  /** Tally runs unlicensed (Educational mode) and takes vouchers dated only the 1st, 2nd or 31st. */
+  educationalMode?: boolean;
+  /** In Educational mode, enter each voucher on the 1st of its month instead, for practice. */
+  moveToFirst?: boolean;
 }
 
 interface ParsedRow {
@@ -107,6 +121,7 @@ interface ParsedRow {
   date: string | null;
   rawDate: string;
   invoiceNo: string;
+  originalInvoiceNo: string;
   party: string;
   gstin: string;
   placeOfSupply: string;
@@ -149,6 +164,7 @@ function parseRow(cells: unknown[], rowNumber: number, mapping: Mapping, kind: K
     date: parseDateCell(raw("date")),
     rawDate: text("date"),
     invoiceNo: text("invoiceNo"),
+    originalInvoiceNo: text("originalInvoiceNo"),
     party: text("party"),
     gstin: text("gstin").toUpperCase().replace(/\s/g, ""),
     placeOfSupply: text("placeOfSupply"),
@@ -185,7 +201,7 @@ function groupRows(rows: ParsedRow[], ctx: Context): ParsedRow[][] {
 }
 
 /** 32-bit FNV-1a; enough to keep REMOTEIDs short and stable for the same company and invoice. */
-function hash(text: string): string {
+export function hash(text: string): string {
   let h = 0x811c9dc5;
   for (let i = 0; i < text.length; i++) {
     h ^= text.charCodeAt(i);
@@ -216,6 +232,7 @@ interface Context {
 interface Stock {
   items: VoucherItem[];
   missing: MissingItem[];
+  hsnMissing: MissingItem[];
   discount: Paise;
 }
 
@@ -224,7 +241,7 @@ const quantityIn = (text: string) => Number(text.replace(/,/g, "").match(/\d+(?:
 /**
  * The bill's product lines as stock entries. Product names in Tally are the supplier's, so a
  * product matches a stock item by name. Whatever the products add up to beyond the taxable value
- * is the bill's discount.
+ * is the bill's discount, entered on each line as Disc % the way accountants do in Tally.
  */
 function stockLines(rows: ParsedRow[], taxable: Paise, ctx: Context, issues: Issue[]): Stock | null {
   const { items, settings } = ctx.input;
@@ -237,6 +254,7 @@ function stockLines(rows: ParsedRow[], taxable: Paise, ctx: Context, issues: Iss
 
   const stock: VoucherItem[] = [];
   const missing = new Map<string, MissingItem>();
+  const hsnMissing = new Map<string, MissingItem>();
   for (const { line, unit } of lines) {
     const amount = parseAmount(line.amount);
     const qty = quantityIn(line.qty);
@@ -248,13 +266,20 @@ function stockLines(rows: ParsedRow[], taxable: Paise, ctx: Context, issues: Iss
     if (!match && !missing.has(normaliseName(line.description))) {
       missing.set(normaliseName(line.description), { name: line.description, hsn: line.hsn, unit });
     }
-    stock.push({ name: match?.name ?? line.description, qty, unit: match?.baseUnits || unit, rate: quantityIn(line.rate), amount });
+    if (match && line.hsn && !match.hsn) hsnMissing.set(match.name, { name: match.name, hsn: line.hsn, unit: match.baseUnits || unit });
+    stock.push({ name: match?.name ?? line.description, qty, unit: match?.baseUnits || unit, rate: quantityIn(line.rate), discountPct: 0, amount });
   }
 
   const productsTotal = stock.reduce((sum, i) => sum + i.amount, 0);
-  const discount = productsTotal - taxable;
-  if (discount < 0) {
+  const typed = rows.map((r) => items.get(r.rowNumber)?.discount).find((d) => d?.value.trim());
+  const chosen = typed ? typedDiscount(typed, productsTotal, taxable, issues) : null;
+  const discount = chosen?.amount ?? productsTotal - taxable;
+  if (!chosen && discount < 0) {
     issues.push({ level: "error", message: `Products add up to ₹${formatPaise(productsTotal)}, less than the taxable value ₹${formatPaise(taxable)}` });
+  }
+  const pct = chosen?.pct ?? (productsTotal ? Math.round((discount / productsTotal) * 10_000) / 100 : 0);
+  if (hsnMissing.size) {
+    issues.push({ level: "warning", message: `${hsnMissing.size} products in Tally have no HSN code; save the bill's codes from here` });
   }
   if (missing.size) {
     const one = missing.size === 1;
@@ -263,7 +288,36 @@ function stockLines(rows: ParsedRow[], taxable: Paise, ctx: Context, issues: Iss
       message: `${missing.size} ${one ? "product is not a stock item" : "products are not stock items"} in Tally. Create ${one ? "it" : "them"} here.`,
     });
   }
-  return { items: stock, missing: [...missing.values()], discount: Math.max(discount, 0) };
+  const entries = discount > 0 ? withDiscount(stock, pct, taxable) : stock;
+  return { items: entries, missing: [...missing.values()], hsnMissing: [...hsnMissing.values()], discount: Math.max(discount, 0) };
+}
+
+/** The discount the user typed in Check Bills; it must still bring the products down to the bill's taxable value. */
+function typedDiscount(d: BillDiscount, gross: Paise, taxable: Paise, issues: Issue[]): { amount: Paise; pct: number } | null {
+  const value = parseAmount(d.value.replace("%", ""));
+  if (value === null || value < 0 || (d.mode === "percent" && value > 10_000)) {
+    issues.push({ level: "error", message: `Discount "${d.value}" is not a valid ${d.mode === "percent" ? "%" : "amount"}` });
+    return null;
+  }
+  const amount = d.mode === "percent" ? Math.round((gross * value) / 10_000) : value;
+  const pct = d.mode === "percent" ? value / 100 : gross ? Math.round((amount / gross) * 10_000) / 100 : 0;
+  if (Math.abs(gross - amount - taxable) > MAX_ROUND_OFF) {
+    issues.push({
+      level: "error",
+      message: `Products ₹${formatPaise(gross)} less discount ₹${formatPaise(amount)} is ₹${formatPaise(gross - amount)}, but the taxable value is ₹${formatPaise(taxable)}`,
+    });
+  }
+  return { amount, pct };
+}
+
+/**
+ * Puts the bill's discount on every line as one Disc %, the way bills print it. Rounding each
+ * line can leave a few paise over; the last line takes them so the lines add up to the taxable value.
+ */
+function withDiscount(stock: VoucherItem[], pct: number, taxable: Paise): VoucherItem[] {
+  const lines = stock.map((i) => ({ ...i, discountPct: pct, amount: Math.round(i.amount * (1 - pct / 100)) }));
+  const over = lines.reduce((sum, i) => sum + i.amount, 0) - taxable;
+  return lines.map((i, n) => (n === lines.length - 1 ? { ...i, amount: i.amount - over } : i));
 }
 
 /** By GSTIN first (the name may be spelled any way), then a name the user linked earlier, then the exact name. */
@@ -279,15 +333,40 @@ function matchParty(name: string, gstin: string, ctx: Context): Ledger | null {
  * because a bill's "place of supply" is usually our own state. A matched supplier ledger is
  * trusted over the row's GSTIN, which on a PDF bill may be our own.
  */
-function isInterState(r: ParsedRow, party: Ledger | null, ctx: Context): boolean {
+function supplyType(r: ParsedRow, party: Ledger | null, ctx: Context): "inter" | "intra" | null {
   const codeOf = (gstin: string) => (/^\d{2}/.test(gstin) ? gstin.slice(0, 2) : null);
   const fromGstin = codeOf(r.gstin);
   const fromLedger = codeOf(party?.gstin ?? "") ?? stateCodeOf(party?.stateName ?? "");
   const partyState =
-    ctx.kind.kind === "purchase"
+    ctx.kind.side === "purchase"
       ? (fromLedger ?? fromGstin ?? stateCodeOf(r.placeOfSupply))
       : (stateCodeOf(r.placeOfSupply) ?? fromGstin ?? fromLedger);
-  return Boolean(ctx.companyState && partyState && partyState !== ctx.companyState);
+  if (!ctx.companyState || !partyState) return null;
+  return partyState === ctx.companyState ? "intra" : "inter";
+}
+
+/**
+ * The two states decide the tax head: the same state pays CGST + SGST, another state IGST. A bill
+ * or row that put all its tax under the other head is entered under the right one; a bill with both
+ * is left as it is and flagged. Nothing moves while either state is unknown.
+ */
+function placeTax(a: Amounts, place: "inter" | "intra" | null, who: string, issues: Issue[]): Amounts {
+  const local = a.cgst + a.sgst;
+  if (place === "inter" && local > 0) {
+    if (!a.igst) {
+      issues.push({ level: "warning", message: `The ${who} is in another state, so the CGST + SGST is entered as IGST` });
+      return { ...a, cgst: 0, sgst: 0, igst: local };
+    }
+    issues.push({ level: "warning", message: `CGST/SGST charged, but the ${who} is in another state (should be IGST)` });
+  } else if (place === "intra" && a.igst > 0) {
+    if (!local) {
+      const cgst = Math.round(a.igst / 2);
+      issues.push({ level: "warning", message: `The ${who} is in the same state, so the IGST is entered as CGST + SGST` });
+      return { ...a, cgst, sgst: a.igst - cgst, igst: 0 };
+    }
+    issues.push({ level: "warning", message: `IGST charged, but the ${who} is in the same state (should be CGST + SGST)` });
+  }
+  return a;
 }
 
 type Amounts = Pick<InvoiceVoucher, "taxable" | "cgst" | "sgst" | "igst">;
@@ -353,39 +432,49 @@ function checkHeader(rows: ParsedRow[], ctx: Context, issues: Issue[]): void {
 
 /** Written the sales way (party Dr, income and output tax Cr); a purchase is the mirror image. */
 function buildLines(
-  v: Amounts & { roundOff: Paise; total: Paise; discount: Paise },
+  v: Amounts & { roundOff: Paise; total: Paise },
   party: Ledger | null,
   partyName: string,
   invoiceNo: string,
+  originalInvoiceNo: string,
   ctx: Context,
 ): LedgerLine[] {
   const { settings } = ctx.input;
-  // With product lines, the purchase/sales ledger carries the products' full value and the discount sits on its own line.
+  const agst = ctx.kind.isReturn && Boolean(originalInvoiceNo);
+  const bill = party?.isBillWise ? { billRef: agst ? originalInvoiceNo : invoiceNo, billType: agst ? ("Agst Ref" as const) : ("New Ref" as const) } : {};
   const lines: LedgerLine[] = [
-    { role: "Party", ledger: partyName, debit: v.total, credit: 0, billRef: party?.isBillWise ? invoiceNo : undefined },
-    { role: ctx.kind.mainRole, ledger: settings.mainLedger, debit: 0, credit: v.taxable + v.discount },
+    { role: "Party", ledger: partyName, debit: v.total, credit: 0, ...bill },
+    { role: ctx.kind.mainRole, ledger: settings.mainLedger, debit: 0, credit: v.taxable },
     { role: "CGST", ledger: settings.cgstLedger, debit: 0, credit: v.cgst },
     { role: "SGST", ledger: settings.sgstLedger, debit: 0, credit: v.sgst },
     { role: "IGST", ledger: settings.igstLedger, debit: 0, credit: v.igst },
-    { role: "Discount", ledger: settings.discountLedger, debit: v.discount, credit: 0 },
     { role: "Round Off", ledger: settings.roundOffLedger, debit: Math.max(-v.roundOff, 0), credit: Math.max(v.roundOff, 0) },
   ];
   const used = lines.filter((l, i) => i < 2 || l.debit !== 0 || l.credit !== 0);
-  return ctx.kind.kind === "purchase" ? used.map((l) => ({ ...l, debit: l.credit, credit: l.debit })) : used;
+  // A purchase mirrors a sale, and a return mirrors its side once more.
+  const mirrored = (ctx.kind.side === "purchase") !== ctx.kind.isReturn;
+  return mirrored ? used.map((l) => ({ ...l, debit: l.credit, credit: l.debit })) : used;
 }
 
-/** The party line is checked separately, with a friendlier message. */
-function checkLines(lines: LedgerLine[], ctx: Context, issues: Issue[]): void {
+/** The party line is checked separately, with a friendlier message. Returns the roles that need a ledger. */
+function checkLines(lines: LedgerLine[], ctx: Context, issues: Issue[]): LedgerRole[] {
+  const missing: LedgerRole[] = [];
   for (const l of lines.slice(1)) {
-    if (!l.ledger) issues.push({ level: "error", message: `Choose a ${l.role} ledger in step 2` });
+    if (!l.ledger) issues.push({ level: "error", message: `No ${l.role} ledger is chosen` });
     else if (!ctx.ledgerNames.has(l.ledger)) issues.push({ level: "error", message: `Ledger "${l.ledger}" is not in Tally` });
+    else continue;
+    missing.push(l.role as LedgerRole);
   }
+  return missing;
 }
 
 function toVoucher(rows: ParsedRow[], index: number, ctx: Context): InvoiceVoucher {
   const [first] = rows;
   const issues: Issue[] = [];
   checkHeader(rows, ctx, issues);
+  const { educationalMode, moveToFirst, company } = ctx.input;
+  const { date, issue: dateIssue } = educationalDate(first.date, { educationalMode, moveToFirst, booksFrom: company.booksFrom });
+  if (dateIssue) issues.push(dateIssue);
 
   const party = matchParty(first.party, first.gstin, ctx);
   if (!first.party && !party) issues.push({ level: "error", message: "Party name is empty" });
@@ -393,18 +482,11 @@ function toVoucher(rows: ParsedRow[], index: number, ctx: Context): InvoiceVouch
     issues.push({ level: "error", message: `Party "${first.party}" is not a ledger in Tally. Create it here, or in Tally and then click Refresh from Tally.` });
   }
 
-  const interState = isInterState(first, party, ctx);
-  const parts = rows.map((r) => rowAmounts(r, interState, issues));
+  const place = supplyType(first, party, ctx);
+  const parts = rows.map((r) => rowAmounts(r, place === "inter", issues));
   const sum = (k: keyof Amounts) => parts.reduce((acc, p) => acc + p[k], 0);
-  const amounts: Amounts = { taxable: sum("taxable"), cgst: sum("cgst"), sgst: sum("sgst"), igst: sum("igst") };
+  const amounts = placeTax({ taxable: sum("taxable"), cgst: sum("cgst"), sgst: sum("sgst"), igst: sum("igst") }, place, ctx.kind.partyWord, issues);
   const computed = amounts.taxable + amounts.cgst + amounts.sgst + amounts.igst;
-
-  const who = ctx.kind.partyWord;
-  if (interState && amounts.cgst + amounts.sgst > 0) {
-    issues.push({ level: "warning", message: `CGST/SGST charged, but the ${who} is in another state (should be IGST)` });
-  } else if (!interState && amounts.igst > 0 && ctx.companyState) {
-    issues.push({ level: "warning", message: `IGST charged, but the ${who} is in the same state (should be CGST + SGST)` });
-  }
 
   const onFile = fileTotal(rows, computed);
   let roundOff = onFile === null ? 0 : onFile - computed;
@@ -421,17 +503,17 @@ function toVoucher(rows: ParsedRow[], index: number, ctx: Context): InvoiceVouch
   const partyName = party?.name ?? first.party;
   const stock = stockLines(rows, amounts.taxable, ctx, issues);
   const discount = stock?.discount ?? 0;
-  const lines = buildLines({ ...amounts, roundOff, total, discount }, party, partyName, first.invoiceNo, ctx);
-  checkLines(lines, ctx, issues);
+  const lines = buildLines({ ...amounts, roundOff, total }, party, partyName, first.invoiceNo, first.originalInvoiceNo, ctx);
+  const missingLedgers = checkLines(lines, ctx, issues);
 
   const hasError = issues.some((i) => i.level === "error");
-  const narration = ctx.kind.kind === "purchase" ? `Purchase as per bill ${first.invoiceNo}` : `Sales as per invoice ${first.invoiceNo}`;
+  const narration = ctx.kind.narration(first.invoiceNo, first.originalInvoiceNo);
   return {
     kind: ctx.kind.kind,
     id: `v${index}`,
     remoteId: remoteIdFor(ctx.input.company, first.invoiceNo || `row-${first.rowNumber}`, ctx.kind, partyName),
     rowNumbers: rows.map((r) => r.rowNumber),
-    date: first.date,
+    date,
     invoiceNo: first.invoiceNo,
     party: partyName,
     partyMissing: Boolean(first.party) && !party,
@@ -446,6 +528,8 @@ function toVoucher(rows: ParsedRow[], index: number, ctx: Context): InvoiceVouch
     lines,
     items: stock?.items ?? [],
     missingItems: stock?.missing ?? [],
+    hsnMissing: stock?.hsnMissing ?? [],
+    missingLedgers,
     discount,
     issues,
     status: hasError ? "error" : issues.length ? "warning" : "ready",

@@ -26,7 +26,10 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi"],
+    "targets": [
+      "nsis",
+      "msi"
+    ],
     "shortDescription": "Excel and bank statements to TallyPrime vouchers",
     "icon": [
       "icons/32x32.png",
@@ -36,9 +39,23 @@
       "icons/icon.ico"
     ],
     "windows": {
-      "webviewInstallMode": { "type": "embedBootstrapper" },
+      "webviewInstallMode": {
+        "type": "embedBootstrapper"
+      },
       "nsis": {
         "installMode": "currentUser"
+      }
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcyQkRBRDZGRDNGMjJBM0IKUldRN0t2TFRiNjI5Y3FuREQ3ak1JbFB1aEVjY05KbnhLeklDQ3hNU0c5NVp1MXRLc3gwenhIK1gK",
+      "endpoints": [
+        "https://github.com/aamer444/tally-helper/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
       }
     }
   }

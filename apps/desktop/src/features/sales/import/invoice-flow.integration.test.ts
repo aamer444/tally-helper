@@ -7,13 +7,15 @@ import { fetchCompanies, fetchLedgers, fetchStockItems, fetchUnits, fetchVoucher
 import type { Company, Ledger, StockItem } from "../../tally/types";
 import { billsToImportFile } from "../pdf/bills";
 import { buildVouchers, type InvoiceVoucher } from "./build-vouchers";
-import { createPartyLedger, newPartyFor } from "./create-party";
+import { createLedger, createPartyLedger, ledgerXml, newPartyFor } from "./create-party";
+import { standardLedger } from "./standard-ledgers";
 import { createStockItems } from "./create-stock";
 import { openSheet, sheetOf, type ImportFile } from "./import-file";
 import { KINDS, type InvoiceKind } from "./kind";
 import { pushVoucher } from "./push";
 import { readWorkbook } from "./read-sheet";
 import { guessSettings } from "./settings";
+import { autoMap } from "./fields";
 import { REPO_ROOT as ROOT, startMockTally } from "../../../test/mock-tally";
 
 // The app talks to Tally through Tauri's HTTP plugin; in tests a plain Node request does the same job.
@@ -89,11 +91,16 @@ describe("purchase import against the dummy Tally", () => {
     expect(await pushVoucher(URL, COMPANY, settings.voucherType, fixed)).toEqual({ state: "created" });
   });
 
+  test("sets up a missing GST ledger in its proper group", async () => {
+    await createLedger(URL, COMPANY, standardLedger("purchase", "CGST"));
+    expect((await fetchLedgers(URL, COMPANY)).find((l) => l.name === "Input CGST")).toMatchObject({ parent: "Duties & Taxes" });
+    expect(ledgerXml(COMPANY, standardLedger("purchase", "IGST"))).toContain("<TAXTYPE>GST</TAXTYPE><GSTDUTYHEAD>Integrated Tax</GSTDUTYHEAD>");
+  });
+
   test("creates a bill's missing products with a new unit, then Tally accepts the item invoice", async () => {
     const company = (await fetchCompanies(URL)).find((c) => c.name === COMPANY)!;
     const ledgers = await fetchLedgers(URL, COMPANY);
     const settings = guessSettings(KINDS.purchase, ledgers, ["Purchase"]);
-    expect(settings.discountLedger).toBe("Discount Received");
 
     const bill = {
       fileName: "df-780.pdf", supplierName: "DELHI FOOTWEAR CO", gstins: ["07AAACD1234E1ZB"], gstin: "",
@@ -166,5 +173,23 @@ describe("sales import against the dummy Tally", () => {
   test("reports Tally's own reason when it rejects a voucher", async () => {
     const broken = { ...vouchers[0], lines: vouchers[0].lines.map((l) => (l.role === "Party" ? { ...l, ledger: "ABC Tradrs" } : l)) };
     expect(await pushVoucher(URL, COMPANY, voucherType, broken)).toEqual({ state: "failed", message: "Ledger 'ABC Tradrs' does not exist!" });
+  });
+});
+
+describe("credit and debit notes against the dummy Tally", () => {
+  test("Tally accepts a credit note and a debit note", async () => {
+    const company = (await fetchCompanies(URL)).find((c) => c.name === COMPANY)!;
+    const ledgers = await fetchLedgers(URL, COMPANY);
+    const head = ["Date", "Note No", "Party Name", "Original Invoice No", "Taxable Value", "GST %", "Total"];
+    for (const [kind, party] of [["credit-note", "ABC Traders"], ["debit-note", "Om Distributors"]] as const) {
+      const settings = guessSettings(KINDS[kind], ledgers, [KINDS[kind].voucherParent]);
+      expect(settings.mainLedger).toMatch(/return/i);
+      const [v] = buildVouchers({
+        kind, rows: [head, ["12/04/2025", `${kind}-1`, party, "INV-101", "1000", "18", "1180"]], headerRow: 0, mapping: autoMap(head),
+        settings, company, ledgers, today: "20251231",
+      });
+      expect(v.status, v.issues.map((i) => i.message).join("; ")).toBe("ready");
+      expect(await pushVoucher(URL, COMPANY, KINDS[kind].voucherParent, v)).toEqual({ state: "created" });
+    }
   });
 });

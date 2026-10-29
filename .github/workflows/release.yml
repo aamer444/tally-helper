@@ -1,0 +1,67 @@
+# Every push to main becomes a release that installed copies of Tally Helper offer as an update.
+# Work in progress stays on dev; merge dev into main when it is ready for testers.
+#
+# Needs one repository secret (Settings > Secrets and variables > Actions):
+#   TAURI_SIGNING_PRIVATE_KEY  the contents of the private key from `tauri signer generate`
+# The app only installs updates signed with that key (its public half is in tauri.conf.json).
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check types and run tests
+        run: |
+          pnpm -r typecheck
+          pnpm --filter @th/desktop test
+
+      # Each release gets a higher number than the last, so installed apps see it as new.
+      - name: Number this version
+        shell: bash
+        run: |
+          VERSION="0.1.${{ github.run_number }}"
+          node -e "const f='apps/desktop/src-tauri/tauri.conf.json';const c=JSON.parse(require('fs').readFileSync(f,'utf8'));c.version='$VERSION';require('fs').writeFileSync(f,JSON.stringify(c,null,2))"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+        with:
+          projectPath: apps/desktop
+          tauriScript: pnpm tauri
+          tagName: v__VERSION__
+          releaseName: Tally Helper __VERSION__
+          releaseBody: "Install: download the file ending in x64-setup.exe below and double-click it. Already installed? The app offers this update by itself."
+          releaseDraft: false
+          prerelease: false

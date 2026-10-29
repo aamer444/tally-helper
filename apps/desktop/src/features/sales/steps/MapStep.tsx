@@ -7,6 +7,7 @@ import type { InvoiceSettings } from "../import/build-vouchers";
 import { cellText, fieldsFor, missingRequired, type FieldDef, type FieldId } from "../import/fields";
 import { columnLetter, headersOf, openSheet, sheetOf, withHeaderRow, type ImportFile } from "../import/import-file";
 import type { KindConfig } from "../import/kind";
+import type { LedgerKey } from "../import/standard-ledgers";
 import { ledgerBlockers, LedgersCard } from "./LedgersCard";
 import { StepFooter } from "./StepFooter";
 import { CARD, SELECT } from "./styles";
@@ -20,11 +21,12 @@ interface MapStepProps {
   settings: InvoiceSettings;
   onSettingsChange: (patch: Partial<InvoiceSettings>) => void;
   masters: Masters;
+  onCreateLedger: (key: LedgerKey) => Promise<void>;
   onBack: () => void;
   onNext: () => void;
 }
 
-export function MapStep({ kind, file, onFileChange, settings, onSettingsChange, masters, onBack, onNext }: MapStepProps) {
+export function MapStep({ kind, file, onFileChange, settings, onSettingsChange, masters, onCreateLedger, onBack, onNext }: MapStepProps) {
   const fields = fieldsFor(kind);
   const blockers = [...missingRequired(file.mapping).map((m) => `Choose the column for ${m}`), ...ledgerBlockers(kind, settings, masters)];
 
@@ -34,7 +36,7 @@ export function MapStep({ kind, file, onFileChange, settings, onSettingsChange, 
         <FileCard file={file} onFileChange={onFileChange} />
         <div className="grid gap-6 xl:grid-cols-2">
           <ColumnsCard fields={fields} file={file} onFileChange={onFileChange} />
-          <LedgersCard kind={kind} settings={settings} onSettingsChange={onSettingsChange} masters={masters} />
+          <LedgersCard kind={kind} settings={settings} onSettingsChange={onSettingsChange} masters={masters} onCreateLedger={onCreateLedger} />
         </div>
         <PreviewCard fields={fields} file={file} />
       </div>

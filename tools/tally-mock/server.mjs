@@ -89,10 +89,13 @@ function handleImport(body) {
     }
     for (const [block, name] of body.matchAll(/<STOCKITEM NAME="([^"]+)"[^>]*>[\s\S]*?<\/STOCKITEM>/g)) {
       const unit = unescape(tag(block, 'BASEUNITS') || '');
-      if (!units.has(unit)) { res.errors.push(`Unit '${unit}' does not exist!`); continue; }
+      const altering = /ACTION="Alter"/i.test(block);
+      if (altering && !stockItems.has(unescape(name))) { res.errors.push('Item does not exist!'); continue; }
+      if (!altering && !units.has(unit)) { res.errors.push(`Unit '${unit}' does not exist!`); continue; }
       stockItems.has(unescape(name)) ? res.altered++ : res.created++;
       stockItems.add(unescape(name));
-      createdStockItems.set(unescape(name), `  <STOCKITEM NAME="${name}" RESERVEDNAME=""><NAME TYPE="String">${name}</NAME><PARENT TYPE="String">Primary</PARENT><BASEUNITS TYPE="String">${tag(block, 'BASEUNITS')}</BASEUNITS></STOCKITEM>\n`);
+      const baseUnits = tag(block, 'BASEUNITS') || tag(createdStockItems.get(unescape(name)) || '', 'BASEUNITS') || '';
+      createdStockItems.set(unescape(name), `  <STOCKITEM NAME="${name}" RESERVEDNAME=""><NAME TYPE="String">${name}</NAME><PARENT TYPE="String">Primary</PARENT><BASEUNITS TYPE="String">${baseUnits}</BASEUNITS><HSNDETAILS.LIST><HSNCODE>${tag(block, 'HSNCODE') || ''}</HSNCODE></HSNDETAILS.LIST></STOCKITEM>\n`);
     }
     for (const [block, name] of body.matchAll(/<LEDGER NAME="([^"]+)"[^>]*>[\s\S]*?<\/LEDGER>/g)) {
       ledgers.has(unescape(name)) ? res.altered++ : res.created++;

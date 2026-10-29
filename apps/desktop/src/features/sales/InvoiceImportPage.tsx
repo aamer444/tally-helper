@@ -5,13 +5,16 @@ import type { TallyConnection } from "../connection/useTallyStatus";
 import type { Company } from "../tally/types";
 import { useMasters } from "../tally/useMasters";
 import { buildVouchers, type InvoiceSettings, type InvoiceVoucher } from "./import/build-vouchers";
-import { createPartyLedger } from "./import/create-party";
-import { createStockItems } from "./import/create-stock";
+import { createLedger, createPartyLedger } from "./import/create-party";
+import { roleFor, SETTING_FOR, standardLedger, type LedgerKey, type LedgerRole } from "./import/standard-ledgers";
+import { createStockItems, saveStockHsn } from "./import/create-stock";
 import { usePartyAliases } from "./import/party-aliases";
 import type { MasterActions } from "./VoucherPanel";
 import { openSheet, sheetOf, type ImportFile } from "./import/import-file";
-import { KINDS, type InvoiceKind } from "./import/kind";
+import { KINDS, type InvoiceKind, type KindConfig } from "./import/kind";
 import { guessSettings } from "./import/settings";
+import { pushVoucher } from "./import/push";
+import { formatPaise } from "../../lib/format";
 import { billsToImportFile } from "./pdf/bills";
 import type { PdfBill } from "./pdf/parse-bill";
 import { BillsStep } from "./steps/BillsStep";
@@ -21,7 +24,7 @@ import { ReviewStep } from "./steps/ReviewStep";
 import { UploadStep } from "./steps/UploadStep";
 
 const [UPLOAD, MAP, REVIEW, PUSH] = [0, 1, 2, 3];
-const PARTY_GROUP: Record<InvoiceKind, RegExp> = { sales: /^sundry debtors$/i, purchase: /^sundry creditors$/i };
+const PARTY_GROUP: Record<KindConfig["side"], RegExp> = { sales: /^sundry debtors$/i, purchase: /^sundry creditors$/i };
 
 /** An Excel/CSV register the user maps column by column, or PDF bills read one per voucher. */
 type Source = { type: "sheet"; file: ImportFile } | { type: "pdf"; bills: PdfBill[] };
@@ -37,6 +40,7 @@ export function InvoiceImportPage({ kind: kindId, tally, company }: InvoiceImpor
   const masters = useMasters(tally.url, company, kind.voucherParent);
   const { aliases, link: linkParty } = usePartyAliases(company);
   const [step, setStep] = useState(UPLOAD);
+  const [moveToFirst, setMoveToFirst] = useState(false);
   const [source, setSource] = useState<Source | null>(null);
   // Ledger choices belong to one company; switching company starts again from the guesses.
   const [overrides, setOverrides] = useState<{ company: string; values: Partial<InvoiceSettings> }>({ company: "", values: {} });
@@ -71,15 +75,39 @@ export function InvoiceImportPage({ kind: kindId, tally, company }: InvoiceImpor
       items: file.items,
       stockItems: masters.stockItems,
       partyAliases: new Map(Object.entries(aliases)),
+      educationalMode: masters.educational,
+      moveToFirst,
     });
-  }, [kindId, file, company, masters.status, masters.ledgers, masters.stockItems, settings, aliases]);
+  }, [kindId, file, company, masters.status, masters.ledgers, masters.stockItems, masters.educational, settings, aliases, moveToFirst]);
 
   // Everything review can fix in Tally; reloading the masters rebuilds every voucher, so all bills
   // of a party or with those products turn ready together.
+  /** Creates the standard ledger for `role` unless the company already has one by that name; returns its name. */
+  async function ensureStandardLedger(role: LedgerRole): Promise<string> {
+    const spec = standardLedger(kindId, role);
+    const existing = masters.ledgers.find((l) => l.name.toLowerCase() === spec.name.toLowerCase());
+    if (existing) return existing.name;
+    await createLedger(tally.url, company!.name, spec);
+    return spec.name;
+  }
+
+  const createLedgerFor = async (key: LedgerKey) => {
+    const name = await ensureStandardLedger(roleFor(kindId, key));
+    changeSettings({ [key]: name });
+    await masters.reload();
+  };
+
   const actions: MasterActions | null = company && {
     companyName: company.name,
-    partyLedgers: masters.ledgers.filter((l) => PARTY_GROUP[kindId].test(l.parent)).map((l) => l.name),
+    partyLedgers: masters.ledgers.filter((l) => PARTY_GROUP[kind.side].test(l.parent)).map((l) => l.name),
     units: masters.units,
+    ledgers: masters.ledgers,
+    fixLedgers: async (fixes) => {
+      const patch: Partial<InvoiceSettings> = {};
+      for (const { role, existing } of fixes) patch[SETTING_FOR[role]] = existing || (await ensureStandardLedger(role));
+      changeSettings(patch);
+      await masters.reload();
+    },
     linkParty,
     createParty: async (party) => {
       await createPartyLedger(tally.url, company.name, party);
@@ -87,6 +115,10 @@ export function InvoiceImportPage({ kind: kindId, tally, company }: InvoiceImpor
     },
     createItems: async (items, unit) => {
       await createStockItems(tally.url, company.name, items, unit, masters.units);
+      await masters.reload();
+    },
+    saveHsn: async (items) => {
+      await saveStockHsn(tally.url, company.name, items);
       await masters.reload();
     },
   };
@@ -147,6 +179,7 @@ export function InvoiceImportPage({ kind: kindId, tally, company }: InvoiceImpor
           settings={settings}
           onSettingsChange={changeSettings}
           masters={masters}
+          onCreateLedger={createLedgerFor}
           onBack={startOver}
           onNext={() => setStep(REVIEW)}
         />
@@ -159,6 +192,7 @@ export function InvoiceImportPage({ kind: kindId, tally, company }: InvoiceImpor
           settings={settings}
           onSettingsChange={changeSettings}
           masters={masters}
+          onCreateLedger={createLedgerFor}
           onBack={startOver}
           onNext={() => setStep(REVIEW)}
         />
@@ -168,10 +202,11 @@ export function InvoiceImportPage({ kind: kindId, tally, company }: InvoiceImpor
           kind={kind}
           vouchers={vouchers}
           file={file}
-          voucherType={settings.voucherType}
           masters={masters}
           onBack={() => setStep(MAP)}
           actions={actions}
+          moveToFirst={moveToFirst}
+          onMoveToFirstChange={setMoveToFirst}
           onPush={(selected) => {
             if (!company) return;
             setPushJob({ vouchers: selected, company, voucherType: settings.voucherType });
@@ -181,11 +216,17 @@ export function InvoiceImportPage({ kind: kindId, tally, company }: InvoiceImpor
       )}
       {effectiveStep === PUSH && pushJob && (
         <PushStep
-          kind={kind}
-          vouchers={pushJob.vouchers}
-          company={pushJob.company}
-          url={tally.url}
-          voucherType={pushJob.voucherType}
+          items={pushJob.vouchers}
+          describe={(v) => ({ date: v.date, reference: v.invoiceNo, party: v.party, amount: v.total })}
+          push={(v) => pushVoucher(tally.url, pushJob.company.name, pushJob.voucherType, v)}
+          referenceLabel={kind.invoiceNoLabel}
+          confirm={
+            <>
+              This will create <b>{pushJob.vouchers.length}</b> {kind.documentWord} vouchers worth{" "}
+              <b>₹{formatPaise(pushJob.vouchers.reduce((n, v) => n + v.total, 0))}</b> in the Tally company <b>{pushJob.company.name}</b>, using voucher
+              type <b>{pushJob.voucherType}</b>.
+            </>
+          }
           onBack={() => setStep(REVIEW)}
           onNewImport={startOver}
         />

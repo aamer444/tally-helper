@@ -9,10 +9,18 @@ export interface BillItem {
   amount: string;
 }
 
+/** A discount the user typed for a bill: a % of its products, or a rupee amount. */
+export interface BillDiscount {
+  value: string;
+  mode: "percent" | "amount";
+}
+
 /** A bill's products and the unit its quantities are in (e.g. "PAIR"; empty when not printed). */
 export interface BillItems {
   lines: BillItem[];
   unit: string;
+  /** Left out (or blank) to take the discount from the bill: products total less taxable value. */
+  discount?: BillDiscount;
 }
 
 const NUMBER = /^\(?(-?\d[\d,]*(?:\.\d+)?)\)?(?:\s*[a-z]{2,6}\.?)?$/i;

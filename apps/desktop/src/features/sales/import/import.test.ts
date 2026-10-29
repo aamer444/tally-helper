@@ -6,6 +6,7 @@ import { isValidGstin, stateCodeOf } from "./gst";
 import { KINDS } from "./kind";
 import { partyKey, similarity } from "./party-match";
 import { guessSettings } from "./settings";
+import { ledgersFor } from "./standard-ledgers";
 import { voucherXml } from "./voucher-xml";
 
 const company: Company = { name: "Demo Traders", guid: "g-1", stateName: "Maharashtra", booksFrom: "20250401" };
@@ -33,7 +34,6 @@ const settings: InvoiceSettings = {
   sgstLedger: "Output SGST 9%",
   igstLedger: "Output IGST 18%",
   roundOffLedger: "Round Off",
-  discountLedger: "",
   withStock: true,
 };
 
@@ -146,7 +146,8 @@ describe("buildVouchers", () => {
 
   test("asks for a tax ledger that was not chosen", () => {
     const [v] = build([["05/04/2025", "INV-13", "Delhi Mart", "100", "18", ""]], { settings: { ...settings, igstLedger: "" } });
-    expect(v.issues.map((i) => i.message)).toContain("Choose a IGST ledger in step 2");
+    expect(v.issues.map((i) => i.message)).toContain("No IGST ledger is chosen");
+    expect(v.missingLedgers).toEqual(["IGST"]);
   });
 
   test("gives the same REMOTEID for the same company and invoice, so a re-push cannot duplicate", () => {
@@ -175,7 +176,7 @@ const purchaseLedgers: Ledger[] = [
   ledger("Purchase Return 5%", "Purchase Accounts"),
   ledger("Input SGST 9%", "Duties & Taxes"),
   ledger("Input IGST", "Duties & Taxes"),
-  ledger("Discount Received", "Indirect Incomes"),
+  ledger("TARA Traders", "Sundry Creditors"),
   ledger("kgn1", "Sundry Creditors"),
   ledger("KGN Traders", "Sundry Creditors"),
 ];
@@ -187,7 +188,6 @@ const purchaseSettings: InvoiceSettings = {
   sgstLedger: "Input SGST 9%",
   igstLedger: "Input IGST",
   roundOffLedger: "Round Off",
-  discountLedger: "Discount Received",
   withStock: true,
 };
 
@@ -228,23 +228,28 @@ describe("item invoices from bills with product lines", () => {
   ];
   // Products 87,480.00, less 4.76% trade discount 4,164.05 = taxable 83,315.95; IGST 5% 4,165.80.
   const bill = ["Sample Footwear Pvt Ltd", "07AAACD1234E1ZB", "INV-7", "07/09/2026", "83315.95", "", "", "4165.80", "87481.75"];
-  const stockItems = products.map((p) => ({ name: p.description, baseUnits: "PAIR" }));
+  const stockItems = products.map((p) => ({ name: p.description, baseUnits: "PAIR", hsn: "64029990" }));
 
-  test("books each product as stock and the bill's discount on its own line", () => {
+  test("books each product as stock with the bill's discount as Disc % on every line", () => {
     const [v] = buildPurchases([bill], { items: items(products), stockItems });
     expect(v.status).toBe("ready");
     expect(v.items).toEqual([
-      { name: "EVA-ASHA LADIES BLACK 5x7", qty: 240, unit: "PAIR", rate: 62, amount: 1_488_000 },
-      { name: "HAWAI-HEALTH GENTS COL/MIX 4x6", qty: 1320, unit: "PAIR", rate: 55, amount: 7_260_000 },
+      { name: "EVA-ASHA LADIES BLACK 5x7", qty: 240, unit: "PAIR", rate: 62, discountPct: 4.76, amount: 1_417_171 },
+      { name: "HAWAI-HEALTH GENTS COL/MIX 4x6", qty: 1320, unit: "PAIR", rate: 55, discountPct: 4.76, amount: 6_914_424 },
     ]);
     expect(v.discount).toBe(416_405);
     expect(v.lines.map((l) => [l.role, l.debit, l.credit])).toEqual([
       ["Party", 0, 8_748_175],
-      ["Purchase", 8_748_000, 0],
+      ["Purchase", 8_331_595, 0],
       ["IGST", 416_580, 0],
-      ["Discount", 0, 416_405],
     ]);
     expect(balance(v)).toBe(0);
+  });
+
+  test("offers to save the bill's HSN codes on products Tally has without one", () => {
+    const [v] = buildPurchases([bill], { items: items(products), stockItems: [stockItems[0], { ...stockItems[1], hsn: "" }] });
+    expect(v.hsnMissing).toEqual([{ name: "HAWAI-HEALTH GENTS COL/MIX 4x6", hsn: "64029990", unit: "PAIR" }]);
+    expect(v.status).toBe("warning");
   });
 
   test("matches stock items whatever the capitals, and lists the ones Tally does not have", () => {
@@ -260,11 +265,32 @@ describe("item invoices from bills with product lines", () => {
     expect(xml).toContain('OBJVIEW="Invoice Voucher View"');
     expect(xml).toContain("<VCHENTRYMODE>Item Invoice</VCHENTRYMODE>");
     expect(xml).toContain(
-      "<ALLINVENTORYENTRIES.LIST><STOCKITEMNAME>EVA-ASHA LADIES BLACK 5x7</STOCKITEMNAME><ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE><RATE>62.00/PAIR</RATE><AMOUNT>-14880.00</AMOUNT><ACTUALQTY> 240 PAIR</ACTUALQTY>",
+      "<ALLINVENTORYENTRIES.LIST><STOCKITEMNAME>EVA-ASHA LADIES BLACK 5x7</STOCKITEMNAME><ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE><RATE>62.00/PAIR</RATE><DISCOUNT>4.76</DISCOUNT><AMOUNT>-14171.71</AMOUNT><ACTUALQTY> 240 PAIR</ACTUALQTY>",
     );
     expect(xml).toContain("<ACCOUNTINGALLOCATIONS.LIST><LEDGERNAME>Purchase GST 5%</LEDGERNAME>");
-    expect(xml).toContain("<LEDGERENTRIES.LIST><LEDGERNAME>Discount Received</LEDGERNAME><ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE><AMOUNT>4164.05</AMOUNT>");
+    expect(xml).not.toContain("Discount");
     expect(xml).not.toContain("<ALLLEDGERENTRIES.LIST><LEDGERNAME>Purchase GST 5%");
+  });
+
+  const withTyped = (discount: { value: string; mode: "percent" | "amount" }) =>
+    new Map([[2, { ...items(products).get(2)!, discount }]]);
+
+  test("takes a discount typed as a %", () => {
+    const [v] = buildPurchases([bill], { items: withTyped({ value: "4.76", mode: "percent" }), stockItems });
+    expect(v).toMatchObject({ status: "ready", discount: 416_405 });
+    expect(v.items.map((i) => i.discountPct)).toEqual([4.76, 4.76]);
+  });
+
+  test("takes a discount typed as a rupee amount", () => {
+    const [v] = buildPurchases([bill], { items: withTyped({ value: "4,164.05", mode: "amount" }), stockItems });
+    expect(v).toMatchObject({ status: "ready", discount: 416_405 });
+    expect(v.items.reduce((sum, i) => sum + i.amount, 0)).toBe(8_331_595);
+  });
+
+  test("says so when the typed discount does not reach the bill's taxable value", () => {
+    const [v] = buildPurchases([bill], { items: withTyped({ value: "10", mode: "percent" }), stockItems });
+    expect(v.status).toBe("error");
+    expect(v.issues.map((i) => i.message)).toContain("Products ₹87,480.00 less discount ₹8,748.00 is ₹78,732.00, but the taxable value is ₹83,315.95");
   });
 
   test("stays an accounting invoice when the user turns stock off", () => {
@@ -288,7 +314,7 @@ describe("purchase vouchers", () => {
     expect(v.status).toBe("ready");
     expect(v.party).toBe("Sample Footwear Pvt Ltd"); // matched by GSTIN, not the printed name
     expect(v.lines).toEqual([
-      { role: "Party", ledger: "Sample Footwear Pvt Ltd", debit: 0, credit: 213_148_861, billRef: "INV/26/0417" },
+      { role: "Party", ledger: "Sample Footwear Pvt Ltd", debit: 0, credit: 213_148_861, billRef: "INV/26/0417", billType: "New Ref" },
       { role: "Purchase", ledger: "Purchase GST 5%", debit: 202_998_917, credit: 0 },
       { role: "IGST", ledger: "Input IGST", debit: 10_149_946, credit: 0 },
       { role: "Round Off", ledger: "Round Off", debit: 0, credit: 2 },
@@ -307,9 +333,22 @@ describe("purchase vouchers", () => {
     expect(vouchers[0].remoteId).not.toBe(vouchers[1].remoteId);
   });
 
-  test("judges inter-state from the supplier's GSTIN, not the bill's place of supply", () => {
+  test("a same-state supplier's IGST is entered as CGST + SGST", () => {
     const [v] = buildPurchases([["Om Distributors", "27AAACE5678F1ZI", "102", "05/04/2026", "1000", "", "", "50", "1050"]]);
-    expect(v.issues.map((i) => i.message)).toContain("IGST charged, but the supplier is in the same state (should be CGST + SGST)");
+    expect(v.issues.map((i) => i.message)).toContain("The supplier is in the same state, so the IGST is entered as CGST + SGST");
+    expect({ cgst: v.cgst, sgst: v.sgst, igst: v.igst }).toEqual({ cgst: 2_500, sgst: 2_500, igst: 0 });
+    expect(v.lines.map((l) => l.ledger)).toEqual(["Om Distributors", "Purchase GST 5%", "Input CGST 9%", "Input SGST 9%"]);
+  });
+
+  test("an other-state supplier's CGST + SGST is entered as IGST", () => {
+    const [v] = buildPurchases([["Sample Footwear Pvt Ltd", "07AAACD1234E1ZB", "103", "05/04/2026", "1000", "25", "25", "", "1050"]]);
+    expect(v.issues.map((i) => i.message)).toContain("The supplier is in another state, so the CGST + SGST is entered as IGST");
+    expect({ cgst: v.cgst, sgst: v.sgst, igst: v.igst }).toEqual({ cgst: 0, sgst: 0, igst: 5_000 });
+  });
+
+  test("leaves the tax alone when the supplier's state is unknown", () => {
+    const [v] = buildPurchases([["kgn1", "", "104", "05/04/2026", "1000", "", "", "50", "1050"]]);
+    expect({ cgst: v.cgst, igst: v.igst }).toEqual({ cgst: 0, igst: 5_000 });
   });
 
   test("trusts the matched supplier's state when the bill's first GSTIN is our own", () => {
@@ -348,5 +387,77 @@ describe("voucherXml", () => {
     expect(xml).toContain("<BILLTYPE>New Ref</BILLTYPE><AMOUNT>-11800.00</AMOUNT>");
     expect(xml).toContain("<LEDGERNAME>Output CGST 9%</LEDGERNAME><ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE><AMOUNT>900.00</AMOUNT>");
     expect(xml).toContain("<NARRATION>R&amp;D &lt;sample&gt;</NARRATION>");
+  });
+});
+
+describe("ledger choices by group", () => {
+  test("never offers a party ledger for the purchase, tax or round-off ledger", () => {
+    const names = (role: Parameters<typeof ledgersFor>[0]) => ledgersFor(role, purchaseLedgers).map((l) => l.name);
+    expect(names("Purchase")).toEqual(["Purchase GST 5%", "Purchase Return 5%"]);
+    expect(names("IGST")).not.toContain("TARA Traders");
+    expect(names("Round Off")).toEqual(["Round Off"]);
+  });
+
+  test("offers ledgers under a group the company made itself", () => {
+    expect(ledgersFor("Purchase", [ledger("Local Purchase", "Purchase - Local")]).map((l) => l.name)).toEqual(["Local Purchase"]);
+  });
+});
+
+describe("Tally in Educational mode", () => {
+  const row = ["Om Distributors", "27AAACE5678F1ZI", "E-1", "07/09/2026", "1000", "90", "90", "", "1180"];
+
+  test("stops a bill whose date unlicensed Tally would drop", () => {
+    const [v] = buildPurchases([row], { educationalMode: true });
+    expect(v.status).toBe("error");
+    expect(v.issues[0].message).toMatch(/Educational mode/);
+  });
+
+  test("can enter it on the 1st of the month instead, with a warning", () => {
+    const [v] = buildPurchases([row], { educationalMode: true, moveToFirst: true });
+    expect(v).toMatchObject({ status: "warning", date: "20260901" });
+  });
+
+  test("leaves the 1st, 2nd and 31st alone", () => {
+    const [v] = buildPurchases([[...row.slice(0, 3), "31/08/2026", ...row.slice(4)]], { educationalMode: true });
+    expect(v).toMatchObject({ status: "ready", date: "20260831" });
+  });
+});
+
+describe("credit and debit notes", () => {
+  const header = (noLabel: string) => ["Date", noLabel, "Party Name", "Original Invoice No", "Taxable Value", "GST %", "Total"];
+  const note = (kind: "credit-note" | "debit-note", noteLedgers: Ledger[], row: unknown[]) => {
+    const head = header(kind === "credit-note" ? "Credit Note No" : "Debit Note No");
+    const noteSettings = guessSettings(KINDS[kind], noteLedgers, [KINDS[kind].voucherParent]);
+    return buildVouchers({ kind, rows: [head, row], headerRow: 0, mapping: autoMap(head), settings: noteSettings, company, ledgers: noteLedgers, today: "20251231" });
+  };
+  const lines = (v: { lines: { role: string; ledger: string; debit: number; credit: number }[] }) => v.lines.map((l) => [l.ledger, l.debit, l.credit]);
+
+  test("reads the note's own number and the original invoice from their columns", () => {
+    expect(autoMap(header("Credit Note No"))).toMatchObject({ invoiceNo: 1, originalInvoiceNo: 3 });
+  });
+
+  test("credit note: Sales Return and output GST debited, customer credited against the original invoice", () => {
+    const [v] = note("credit-note", [...ledgers, ledger("Sales Return 18%", "Sales Accounts")], ["10/04/2025", "CN-1", "ABC Traders", "INV-1", "1000", "18", "1180"]);
+    expect(v.status).toBe("ready");
+    expect(lines(v)).toEqual([
+      ["ABC Traders", 0, 118_000],
+      ["Sales Return 18%", 100_000, 0],
+      ["Output CGST 9%", 9_000, 0],
+      ["Output SGST 9%", 9_000, 0],
+    ]);
+    expect(v.lines[0]).toMatchObject({ billRef: "INV-1", billType: "Agst Ref" });
+    expect(v.narration).toBe("Credit note CN-1 against invoice INV-1");
+    expect(voucherXml(v, "Credit Note")).toContain("<NAME>INV-1</NAME><BILLTYPE>Agst Ref</BILLTYPE>");
+  });
+
+  test("debit note: supplier debited, Purchase Return and input GST credited", () => {
+    const [v] = note("debit-note", purchaseLedgers, ["10/04/2025", "DN-1", "Om Distributors", "", "1000", "18", "1180"]);
+    expect(v.status).toBe("ready");
+    expect(lines(v)).toEqual([
+      ["Om Distributors", 118_000, 0],
+      ["Purchase Return 5%", 0, 100_000],
+      ["Input CGST 9%", 0, 9_000],
+      ["Input SGST 9%", 0, 9_000],
+    ]);
   });
 });

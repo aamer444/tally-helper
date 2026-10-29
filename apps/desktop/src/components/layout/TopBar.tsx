@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Bell, Building2, Search, Settings } from "lucide-react";
+import { Bell, Building2, PanelLeft, Search, Settings } from "lucide-react";
 import { formatTallyDate } from "../../lib/format";
 import { RetryButton } from "../../features/connection/RetryButton";
 import {
@@ -9,11 +9,26 @@ import {
 } from "../../features/connection/useTallyStatus";
 import type { CompanyState } from "../../features/tally/useCompanies";
 
-export function TopBar({ tally, company }: { tally: TallyConnection; company: CompanyState }) {
+interface TopBarProps {
+  tally: TallyConnection;
+  company: CompanyState;
+  onToggleSidebar: () => void;
+}
+
+export function TopBar({ tally, company, onToggleSidebar }: TopBarProps) {
   const { label, dotClass } = describeStatus(tally.status);
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-5 border-b border-slate-200 bg-white px-4 whitespace-nowrap">
+      <button
+        type="button"
+        aria-label="Show or hide the menu"
+        title="Show or hide the menu (Ctrl+B)"
+        onClick={onToggleSidebar}
+        className="-mr-2 grid size-9 place-items-center rounded-md text-slate-600 hover:bg-slate-100"
+      >
+        <PanelLeft size={18} />
+      </button>
       <CompanyPicker company={company} />
 
       <div className="flex items-center gap-2 border-l border-slate-200 pl-5 text-sm leading-tight">

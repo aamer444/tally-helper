@@ -1,0 +1,11 @@
+Demo Traders - Journal entries April 2025 (synthetic sample),,,,,
+Date,Voucher No,Ledger,Debit,Credit,Narration
+30/04/2025,JV-1,Bank Charges,500.00,,Reclass of charges booked to suspense
+30/04/2025,JV-1,Suspense A/c,,500.00,
+30/04/2025,JV-2,Salary Expenses,"25,000.00",,Salary provision for April
+30/04/2025,JV-2,Salary Payable,,"25,000.00",
+30/04/2025,JV-3,Om Distributors,"1,000.00",,Set off between customer and supplier
+,,abc traders,,"1,000.00",
+30/04/2025,JV-4,Bank Charges,100.00,,Typo in amount
+30/04/2025,JV-4,Cash,,90.00,
+Total,,,"26,600.00","26,590.00",

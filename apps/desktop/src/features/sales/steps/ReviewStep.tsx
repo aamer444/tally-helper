@@ -10,6 +10,7 @@ import { headersOf, sheetOf, type ImportFile } from "../import/import-file";
 import type { KindConfig } from "../import/kind";
 import { VoucherPanel, type MasterActions } from "../VoucherPanel";
 import { VoucherTable } from "../VoucherTable";
+import { EducationalBanner } from "../../tally/EducationalBanner";
 import { StepFooter } from "./StepFooter";
 
 type Filter = "all" | ReviewStatus;
@@ -18,11 +19,14 @@ interface ReviewStepProps {
   kind: KindConfig;
   vouchers: InvoiceVoucher[];
   file: ImportFile;
-  voucherType: string;
+
   masters: Masters;
   onBack: () => void;
   onPush: (selected: InvoiceVoucher[]) => void;
   actions: MasterActions | null;
+  /** Only asked when Tally runs in Educational mode. */
+  moveToFirst: boolean;
+  onMoveToFirstChange: (on: boolean) => void;
 }
 
 function summarise(vouchers: InvoiceVoucher[]) {
@@ -42,7 +46,7 @@ function matches(v: InvoiceVoucher, filter: Filter, query: string): boolean {
   return !q || [v.invoiceNo, v.party, v.gstin, ...v.lines.map((l) => l.ledger)].some((s) => s.toLowerCase().includes(q));
 }
 
-export function ReviewStep({ kind, vouchers, file, voucherType, masters, onBack, onPush, actions }: ReviewStepProps) {
+export function ReviewStep({ kind, vouchers, file, masters, onBack, onPush, actions, moveToFirst, onMoveToFirstChange }: ReviewStepProps) {
   const stats = useMemo(() => summarise(vouchers), [vouchers]);
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
@@ -84,6 +88,7 @@ export function ReviewStep({ kind, vouchers, file, voucherType, masters, onBack,
   return (
     <>
       <div className="flex-1 space-y-4 px-6 pb-4">
+        {masters.educational && <EducationalBanner moveToFirst={moveToFirst} onMoveToFirstChange={onMoveToFirstChange} />}
         <div className="grid grid-cols-5 gap-4">
           <StatCard icon={FileSpreadsheet} tone="blue" label="Rows Read" value={stats.rows} hint={`from ${file.workbook.fileName}`} />
           <StatCard icon={ReceiptText} tone="blue" label="Vouchers" value={stats.vouchers} hint={`${stats.rows} rows joined by ${kind.invoiceNoLabel}`} />
@@ -140,7 +145,6 @@ export function ReviewStep({ kind, vouchers, file, voucherType, masters, onBack,
               voucher={selected}
               headers={headersOf(file)}
               sheetRows={sheetOf(file).rows}
-              voucherType={voucherType}
               actions={actions}
               onClose={() => setSelectedId(null)}
             />

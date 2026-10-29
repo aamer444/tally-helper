@@ -1,20 +1,11 @@
 import { NAV_SECTIONS, type PageId } from "../../app/navigation";
-import { RetryButton } from "../../features/connection/RetryButton";
-import type { Company } from "../../features/tally/types";
-import {
-  describeStatus,
-  isDisconnected,
-  type TallyConnection,
-} from "../../features/connection/useTallyStatus";
 
 interface SidebarProps {
   active: PageId;
   onNavigate: (page: PageId) => void;
-  tally: TallyConnection;
-  company: Company | null;
 }
 
-export function Sidebar({ active, onNavigate, tally, company }: SidebarProps) {
+export function Sidebar({ active, onNavigate }: SidebarProps) {
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-slate-200 bg-slate-50">
       <Brand />
@@ -44,7 +35,10 @@ export function Sidebar({ active, onNavigate, tally, company }: SidebarProps) {
           </div>
         ))}
       </nav>
-      <ConnectionCard tally={tally} company={company} />
+      <p className="my-3 text-center text-xs text-slate-500">
+        Press <kbd className="rounded border border-slate-300 bg-white px-1.5 py-0.5 font-sans text-[11px] text-slate-700">Ctrl</kbd> +{" "}
+        <kbd className="rounded border border-slate-300 bg-white px-1.5 py-0.5 font-sans text-[11px] text-slate-700">B</kbd> to hide this menu
+      </p>
     </aside>
   );
 }
@@ -63,18 +57,3 @@ function Brand() {
   );
 }
 
-function ConnectionCard({ tally, company }: { tally: TallyConnection; company: Company | null }) {
-  const { label, dotClass } = describeStatus(tally.status);
-  return (
-    <div className="m-3 rounded-lg border border-slate-200 bg-white p-3 text-sm">
-      <p className="flex items-center gap-2 font-medium">
-        <span className={`size-2.5 rounded-full ${dotClass}`} />
-        {label}
-      </p>
-      <p className="mt-1 truncate pl-4.5 text-xs text-slate-500" title={company?.name}>
-        {company?.name ?? "No company selected"}
-      </p>
-      {isDisconnected(tally.status) && <RetryButton tally={tally} className="mt-2 w-full justify-center" />}
-    </div>
-  );
-}

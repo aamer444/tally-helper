@@ -21,3 +21,7 @@ research/_private/
 !research/**/*.xml
 !research/**/*.csv
 !tools/tally-mock/samples/**
+
+# Update signing keys live outside the repo (~/.tauri); never commit one
+*.key
+*.key.pub

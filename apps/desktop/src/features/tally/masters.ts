@@ -69,10 +69,13 @@ export async function fetchLedgers(url: string, company: string): Promise<Ledger
 }
 
 export async function fetchStockItems(url: string, company: string): Promise<StockItem[]> {
-  const doc = await postToTally(url, collectionRequest(company, "THStockItems", "StockItem", "Name, BaseUnits"), 60_000);
+  const fetch = "Name, BaseUnits, GSTDetails.HSNCode, HSNDetails.HSNCode";
+  const doc = await postToTally(url, collectionRequest(company, "THStockItems", "StockItem", fetch), 60_000);
   rejectLineError(doc);
+  // The code sits in HSNDETAILS (TallyPrime 4+) or GSTDETAILS (older); either will do.
+  const hsnOf = (el: Element) => [...el.getElementsByTagName("HSNCODE")].map((h) => h.textContent?.trim() ?? "").find(Boolean) ?? "";
   return [...doc.getElementsByTagName("STOCKITEM")]
-    .map((el) => ({ name: nameOf(el), baseUnits: childText(el, "BASEUNITS") }))
+    .map((el) => ({ name: nameOf(el), baseUnits: childText(el, "BASEUNITS"), hsn: hsnOf(el) }))
     .filter((s) => s.name);
 }
 
@@ -81,6 +84,24 @@ export async function fetchUnits(url: string, company: string): Promise<string[]
   const doc = await postToTally(url, collectionRequest(company, "THUnits", "Unit", "Name"));
   rejectLineError(doc);
   return [...doc.getElementsByTagName("UNIT")].map(nameOf).filter(Boolean);
+}
+
+const EDUCATIONAL_MODE_REQUEST = `<ENVELOPE>
+ <HEADER><VERSION>1</VERSION><TALLYREQUEST>Export</TALLYREQUEST><TYPE>Function</TYPE><ID>$$LicenseInfo</ID></HEADER>
+ <BODY><DESC><FUNCPARAMLIST><PARAM>IsEducationalMode</PARAM></FUNCPARAMLIST></DESC></BODY>
+</ENVELOPE>`;
+
+/**
+ * Whether TallyPrime runs without a licence (Educational mode). It then takes vouchers dated only
+ * the 1st, 2nd or 31st, and reports any other date as "missing". False when Tally does not say.
+ */
+export async function fetchEducationalMode(url: string): Promise<boolean> {
+  try {
+    const doc = await postToTally(url, EDUCATIONAL_MODE_REQUEST);
+    return doc.getElementsByTagName("RESULT")[0]?.textContent?.trim() === "Yes";
+  } catch {
+    return false;
+  }
 }
 
 /** Voucher types under one parent, e.g. Sales gives "Sales" and a custom "Cash Sale". */

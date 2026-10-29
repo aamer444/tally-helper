@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "pnpm --parallel --filter @th/tally-mock --filter @th/desktop dev",
+    "dev:real": "pnpm --filter @th/desktop dev:real",
     "build": "pnpm --filter @th/desktop build",
     "typecheck": "pnpm -r typecheck",
     "mock": "pnpm --filter @th/tally-mock dev"
