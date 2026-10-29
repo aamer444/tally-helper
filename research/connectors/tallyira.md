@@ -56,12 +56,12 @@ Count Name
    20 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |  localhost:9 | Failed to get loaded companies from Tally                                                             
    20 [<TS>] | WARNING  | 9.9.9 (b9e9b9.9-9-9) |  localhost:9 | Unable to connect to TallyPrime's server port: Is Tally Server runing at port 9?                      
    19 [<TS>] | WARNING  | 9.9.9 (b9e9b9.9-9-9) |  localhost:9 | Error Communicating with Tally, will retry next time [errors (9) <= max errors (9)] ...               
-   17 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |  localhost:9 | FetchLoadedCompany timed out for company: GARDEN TRADERS {COMPANY} -(9-9) - (from 9-Apr-9)               
+   17 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |  localhost:9 | FetchLoadedCompany timed out for company: CLIENT COMPANY {COMPANY} -(9-9) - (from 9-Apr-9)               
    14 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |    Event Client | Unable to send UDP message, retrying after 9 seconds...                                            
-   13 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) |  localhost:9 | Error deregistering company: GARDEN TRADERS {COMPANY} -(9-9) (Already deregisters?)                       
+   13 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) |  localhost:9 | Error deregistering company: CLIENT COMPANY {COMPANY} -(9-9) (Already deregisters?)                       
    12 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |    Event Client | Error sending UDP message: 9 | A socket operation was attempted to an unreachable network.         
    10 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |    Event Client | Error receiving UDP message, resetting receive loop ... | A blocking operation was interrupted by a
-    9 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |  localhost:9 | FetchLoadedCompany timed out for company: GARDEN TRADERS {COMPANY} -(9-9)                                
+    9 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |  localhost:9 | FetchLoadedCompany timed out for company: CLIENT COMPANY {COMPANY} -(9-9)                                
     8 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) |     Main Thread | Error initializing UDP client OR UDP connection test failed, using SSE based communication          
     8 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) | localhost:9 | Error deregistering company: T.S Traders {COMPANY} - 9-9 (Already deregisters?)                            
     8 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) |  localhost:9 | Error deregistering company: Fame  Traders (Already deregisters?)                                      
@@ -79,7 +79,7 @@ Count Name
     7 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) |     Main Thread | Unable to check for latest build version.                                                           
     7 [<TS>] | ERROR    | 9.9.9 (b9af9.9-9-9) |    Event Client | Failed to call GetCredentialsAPI                                                                    
     6 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) | localhost:9 | Error deregistering company: Fame  Traders (Already deregisters?)                                       
-    6 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) | localhost:9 | Error deregistering company: GARDEN TRADERS {COMPANY} -(9-9) (Already deregisters?)                        
+    6 [<TS>] | WARNING  | 9.9.9 (b9af9.9-9-9) | localhost:9 | Error deregistering company: CLIENT COMPANY {COMPANY} -(9-9) (Already deregisters?)                        
     5 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |    Event Client | Failed to call GetCredentialsAPI, retrying... (9)                                                  
     5 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |     Main Thread | Connection Error: | Timeout was reached                                                            
     5 [<TS>] | ERROR    | 9.9.9 (b9e9b9.9-9-9) |     Main Thread | Failed to call GetCredentialsAPI, retrying... (9)                                                  

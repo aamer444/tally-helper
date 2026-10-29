@@ -168,7 +168,7 @@ Count Name
   189         </TALLYMESSAGE>                                                         
   189 </ENVELOPE>                                                                     
   189         <STATICVARIABLES>                                                       
-  189           <SVCURRENTCOMPANY>GARDEN TRADERS {COMPANY} -(9-9)</SVCURRENTCOMPANY>     
+  189           <SVCURRENTCOMPANY>CLIENT COMPANY {COMPANY} -(9-9)</SVCURRENTCOMPANY>     
   189         </STATICVARIABLES>                                                      
   189     <IMPORTDATA>                                                                
   189       <REQUESTDESC>                                                             

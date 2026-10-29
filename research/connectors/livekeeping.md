@@ -211,7 +211,7 @@ Count Name
   124 <TS> Sync completed with no tally operation found.                                     
   122 <TS> stockItemNamesForReport.Count:9                                                   
   122 <TS> ledgerNamesForReport.Count:9                                                      
-  121 <TS> =====================GARDEN TRADERS {COMPANY} -(9-9)==========================       
+  121 <TS> =====================CLIENT COMPANY {COMPANY} -(9-9)==========================       
   113 <TS> Report:outstandings, Ledgers Count:9                                              
   113 <TS> Uploading Reports (9/9)                                                           
   113 <TS> Report:outstandings, Before ledgers list filter Count:9                           
